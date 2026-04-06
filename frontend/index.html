@@ -60,13 +60,37 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
 .btn-lg.outline:hover{background:var(--parchment-dark);}
 
 /* ── LANDING ── */
-.hero{min-height:calc(100vh - 58px);display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:4rem;max-width:1100px;margin:0 auto;padding:4rem 2rem;}
-.hero-text h1{font-family:var(--font-display);font-size:clamp(42px,6vw,68px);line-height:1.1;font-weight:600;color:var(--ink);margin-bottom:1rem;}
-.hero-text h1 em{font-style:italic;color:var(--gold-dim);}
-.hero-subtitle{font-size:16px;color:var(--ink-soft);line-height:1.7;max-width:440px;margin-bottom:2rem;}
-.hero-actions{display:flex;gap:12px;flex-wrap:wrap;}
-.hero-visual{display:flex;flex-direction:column;gap:12px;}
-.koota-preview-card{background:var(--surface);border:.5px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;animation:slideIn .5s ease both;}
+.landing-shell{position:relative;overflow:hidden;background:
+  radial-gradient(circle at top left, rgba(240,216,144,.32), transparent 32%),
+  radial-gradient(circle at 90% 10%, rgba(201,168,76,.12), transparent 24%),
+  linear-gradient(180deg, #fdf8ef 0%, #f8f1e4 100%);}
+.landing-shell::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(139,111,46,.08) 1px, transparent 1px);background-size:24px 24px;opacity:.4;pointer-events:none;}
+.hero{position:relative;min-height:calc(100vh - 58px);display:grid;grid-template-columns:minmax(0,1.08fr) minmax(360px,.92fr);align-items:center;gap:3.5rem;max-width:1180px;margin:0 auto;padding:4.5rem 2rem 5rem;}
+.hero-text{position:relative;z-index:1;}
+.hero-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid var(--border-strong);border-radius:999px;background:rgba(255,253,248,.72);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:1.25rem;}
+.hero-kicker::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--gold);}
+.hero-text h1{font-family:var(--font-display);font-size:clamp(52px,7vw,90px);line-height:.95;font-weight:600;color:var(--ink);margin-bottom:1.15rem;max-width:7.4ch;}
+.hero-text h1 em{display:block;font-style:italic;color:var(--gold-dim);}
+.hero-subtitle{font-size:18px;color:var(--ink-mid);line-height:1.75;max-width:620px;margin-bottom:1.4rem;}
+.hero-story{max-width:620px;font-size:15px;color:var(--ink-soft);line-height:1.8;margin-bottom:2rem;}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:1.4rem;}
+.hero-proof{display:flex;gap:14px;flex-wrap:wrap;}
+.proof-chip{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;border:.5px solid var(--border);background:rgba(255,253,248,.8);box-shadow:var(--shadow);font-size:13px;color:var(--ink-mid);}
+.proof-num{font-family:var(--font-display);font-size:24px;font-weight:600;color:var(--gold-dim);line-height:1;}
+.hero-visual{position:relative;z-index:1;display:flex;flex-direction:column;gap:14px;}
+.hero-panel{background:rgba(255,253,248,.92);border:1px solid rgba(201,168,76,.24);border-radius:22px;padding:24px;box-shadow:0 18px 50px rgba(61,47,18,.12);}
+.hero-panel-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px;}
+.hero-panel-title{font-family:var(--font-display);font-size:34px;line-height:1;color:var(--ink);}
+.hero-panel-meta{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dim);}
+.hero-score{min-width:96px;height:96px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg, #fff7de 0%, #f2dfad 100%);border:2px solid rgba(201,168,76,.5);}
+.hero-score strong{font-family:var(--font-display);font-size:34px;color:var(--ink);line-height:1;}
+.hero-score span{font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.08em;}
+.story-points{display:grid;gap:10px;margin-bottom:16px;}
+.story-point{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:rgba(240,232,213,.5);border:.5px solid rgba(201,168,76,.2);}
+.story-point-badge{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--parchment);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.story-point-title{font-size:13px;font-weight:600;color:var(--ink);}
+.story-point-desc{font-size:12px;color:var(--ink-soft);line-height:1.6;margin-top:2px;}
+.koota-preview-card{background:var(--surface);border:.5px solid var(--border);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;animation:slideIn .5s ease both;box-shadow:0 12px 28px rgba(26,18,9,.06);}
 .koota-preview-card:nth-child(1){animation-delay:.1s;}
 .koota-preview-card:nth-child(2){animation-delay:.2s;}
 .koota-preview-card:nth-child(3){animation-delay:.3s;}
@@ -81,12 +105,34 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
 .features-section{background:var(--surface);border-top:.5px solid var(--border);padding:5rem 2rem;}
 .features-inner{max-width:1000px;margin:0 auto;}
 .section-label{font-size:12px;font-weight:500;letter-spacing:.12em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:.5rem;}
-.section-title{font-family:var(--font-display);font-size:36px;font-weight:600;color:var(--ink);margin-bottom:2.5rem;}
+.section-title{font-family:var(--font-display);font-size:40px;font-weight:600;color:var(--ink);margin-bottom:1rem;}
+.section-copy{font-size:16px;line-height:1.8;color:var(--ink-soft);max-width:760px;margin-bottom:2.5rem;}
 .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
-.feature-card{padding:1.5rem;border:.5px solid var(--border);border-radius:12px;background:var(--parchment);}
+.feature-card{padding:1.6rem;border:.5px solid var(--border);border-radius:16px;background:linear-gradient(180deg, #fffdf8 0%, #f8f0e0 100%);}
 .feature-num{font-family:var(--font-display);font-size:28px;font-weight:600;color:var(--border-strong);margin-bottom:.75rem;}
-.feature-title{font-size:14px;font-weight:500;margin-bottom:.4rem;}
-.feature-desc{font-size:13px;color:var(--ink-soft);line-height:1.6;}
+.feature-title{font-size:15px;font-weight:600;margin-bottom:.45rem;color:var(--ink);}
+.feature-desc{font-size:13px;color:var(--ink-soft);line-height:1.7;}
+.difference-section{padding:5rem 2rem;background:linear-gradient(180deg, rgba(232,220,196,.45) 0%, rgba(250,245,236,.8) 100%);border-top:.5px solid var(--border);}
+.difference-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.1fr .9fr;gap:2rem;align-items:start;}
+.difference-card{background:rgba(255,253,248,.92);border:1px solid rgba(201,168,76,.24);border-radius:20px;padding:24px;box-shadow:var(--shadow);}
+.difference-list{display:grid;gap:12px;}
+.difference-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 0;border-bottom:.5px solid var(--border);}
+.difference-row:last-child{border-bottom:none;}
+.difference-label{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:6px;}
+.difference-good{font-size:14px;color:var(--ink);font-weight:600;}
+.difference-bad{font-size:14px;color:var(--ink-soft);}
+.story-steps{display:grid;gap:14px;}
+.story-step{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:16px;background:rgba(255,253,248,.88);border:.5px solid var(--border);}
+.story-step-num{width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.story-step-title{font-size:15px;font-weight:600;color:var(--ink);}
+.story-step-copy{font-size:13px;line-height:1.7;color:var(--ink-soft);margin-top:3px;}
+.cta-band{padding:4.5rem 2rem 5rem;background:var(--ink);color:var(--parchment);}
+.cta-inner{max-width:1020px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:2rem;padding:28px;border-radius:24px;background:linear-gradient(135deg, rgba(255,255,255,.06), rgba(201,168,76,.1));border:1px solid rgba(240,216,144,.18);}
+.cta-copy h3{font-family:var(--font-display);font-size:42px;line-height:1;margin-bottom:10px;}
+.cta-copy p{max-width:620px;font-size:15px;line-height:1.8;color:rgba(250,245,236,.82);}
+.cta-actions{display:flex;gap:12px;flex-wrap:wrap;}
+.cta-band .btn-lg.outline{color:var(--parchment);border-color:rgba(240,216,144,.4);}
+.cta-band .btn-lg.outline:hover{background:rgba(255,255,255,.08);}
 
 /* ── AUTH MODAL ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(26,18,9,.5);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;}
@@ -315,9 +361,14 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
 
 /* ── RESPONSIVE ── */
 @media(max-width:768px){
-  .hero{grid-template-columns:1fr;}.hero-visual{display:none;}
+  .hero{grid-template-columns:1fr;padding:3rem 1.25rem 4rem;}
+  .hero-text h1{max-width:none;}
+  .hero-visual{display:none;}
   .app-layout{grid-template-columns:1fr;}.sidebar{display:none;}
   .features-grid{grid-template-columns:1fr;}
+  .difference-inner{grid-template-columns:1fr;}
+  .difference-row{grid-template-columns:1fr;}
+  .cta-inner{flex-direction:column;align-items:flex-start;}
   .dash-grid{grid-template-columns:repeat(2,1fr);}
   .dash-row{grid-template-columns:1fr;}
   .chat-layout{grid-template-columns:1fr;}
@@ -349,59 +400,183 @@ nav{position:sticky;top:0;z-index:100;background:rgba(250,245,236,0.96);backdrop
 <!-- LANDING PAGE -->
 <!-- ══════════════════════════════════════════════ -->
 <div class="page active" id="page-landing">
-  <nav>
-    <div class="nav-logo" onclick="goTo('landing')">Ashta<span>koota</span></div>
-    <div class="nav-links"></div>
-    <div class="nav-right">
-      <button class="btn-ghost" onclick="openAuth('login')">Sign in</button>
-      <button class="btn-primary" onclick="openAuth('register')">Join free</button>
-    </div>
-  </nav>
+  <div class="landing-shell">
+    <nav>
+      <div class="nav-logo" onclick="goTo('landing')">Ashta<span>koota</span></div>
+      <div class="nav-links"></div>
+      <div class="nav-right">
+        <button class="btn-ghost" onclick="openAuth('login')">Sign in</button>
+        <button class="btn-primary" onclick="openAuth('register')">Build my profile</button>
+      </div>
+    </nav>
 
-  <div class="hero">
-    <div class="hero-text">
-      <h1>Find your<br><em>cosmic match</em></h1>
-      <p class="hero-subtitle">A Vedic-first dating app for people seeking intentional relationships. Build a real profile, meet people aligned with your intent, and unlock an 8-Koota compatibility reading when interest becomes mutual.</p>
-      <div class="hero-actions">
-        <button class="btn-lg primary" onclick="openAuth('register')">Create my profile</button>
-        <button class="btn-lg outline" onclick="openAuth('login')">Sign in</button>
+    <div class="hero">
+      <div class="hero-text">
+        <div class="hero-kicker">Intentional dating, not slot-machine swiping</div>
+        <h1>Stop Swiping Blindly<em>Date with context.</em></h1>
+        <p class="hero-subtitle">Ashtakoota helps people slow down, show up honestly, and understand romantic compatibility before wasting weeks on another shallow match.</p>
+        <p class="hero-story">This is not an app built only for one community, one ethnicity, or one kind of dater. If you want something more grounded than endless swiping, you can build a real profile, state your intent clearly, and use astrological compatibility as one meaningful layer, not the whole story.</p>
+        <div class="hero-actions">
+          <button class="btn-lg primary" onclick="openAuth('register')">Create my profile</button>
+          <button class="btn-lg outline" onclick="openAuth('login')">I already have an account</button>
+        </div>
+        <div class="hero-proof">
+          <div class="proof-chip"><span class="proof-num">8</span><span>compatibility dimensions, explained simply</span></div>
+          <div class="proof-chip"><span class="proof-num">1</span><span>clear profile with intent, values, and relationship goals</span></div>
+          <div class="proof-chip"><span class="proof-num">0</span><span>pressure to perform for a swipe-first algorithm</span></div>
+        </div>
       </div>
-    </div>
-    <div class="hero-visual">
-      <div class="koota-preview-card">
-        <div class="koota-icon">N</div>
-        <div><div class="koota-name">Nadi Koota</div><div class="koota-label">Life energy &amp; progeny</div></div>
-        <div class="koota-pts">8 pts</div>
-      </div>
-      <div class="koota-preview-card">
-        <div class="koota-icon">B</div>
-        <div><div class="koota-name">Bhakoot Koota</div><div class="koota-label">Emotional harmony</div></div>
-        <div class="koota-pts">7 pts</div>
-      </div>
-      <div class="koota-preview-card">
-        <div class="koota-icon">G</div>
-        <div><div class="koota-name">Gana Koota</div><div class="koota-label">Temperament match</div></div>
-        <div class="koota-pts">6 pts</div>
-      </div>
-      <div class="koota-preview-card">
-        <div class="koota-icon">M</div>
-        <div><div class="koota-name">Graha Maitri</div><div class="koota-label">Planetary friendship</div></div>
-        <div class="koota-pts">5 pts</div>
-      </div>
-    </div>
-  </div>
 
-  <div class="features-section">
-    <div class="features-inner">
-      <div class="section-label">How it works</div>
-      <div class="section-title">Intentional dating with real structure</div>
-      <div class="features-grid">
-        <div class="feature-card"><div class="feature-num">01</div><div class="feature-title">Build a real dating profile</div><div class="feature-desc">Share your age, region, relationship intent, and what kind of partner you want to meet, alongside your Vedic chart markers.</div></div>
-        <div class="feature-card"><div class="feature-num">02</div><div class="feature-title">Filter by intent</div><div class="feature-desc">Browse people by astrology, but also by seriousness. Long-term, marriage-minded, and exploratory daters should not all be mixed together.</div></div>
-        <div class="feature-card"><div class="feature-num">03</div><div class="feature-title">Like with clarity</div><div class="feature-desc">Use likes to express genuine romantic interest. When the feeling is mutual, the app opens chat and treats the connection like a real match.</div></div>
-        <div class="feature-card"><div class="feature-num">04</div><div class="feature-title">Reveal compatibility intentionally</div><div class="feature-desc">Send a reading request when you want a deeper look. Once accepted, all 8 Kootas are calculated instantly with a detailed breakdown.</div></div>
-        <div class="feature-card"><div class="feature-num">05</div><div class="feature-title">Safer by design</div><div class="feature-desc">Profiles can be blocked, reported, and filtered out of your feed. The product is built for public release, not just a demo flow.</div></div>
-        <div class="feature-card"><div class="feature-num">06</div><div class="feature-title">Keep the meaningful stuff</div><div class="feature-desc">See your strongest matches, review past readings, and save a polished compatibility certificate when a connection deserves it.</div></div>
+      <div class="hero-visual">
+        <div class="hero-panel">
+          <div class="hero-panel-top">
+            <div>
+              <div class="hero-panel-meta">Why people stay</div>
+              <div class="hero-panel-title">Clarity beats chemistry theater.</div>
+            </div>
+            <div class="hero-score"><strong>33</strong><span>of 36</span></div>
+          </div>
+          <div class="story-points">
+            <div class="story-point">
+              <div class="story-point-badge">01</div>
+              <div>
+                <div class="story-point-title">State your intent upfront</div>
+                <div class="story-point-desc">Marriage-minded, long-term, serious dating, or exploring. No mixed signals by design.</div>
+              </div>
+            </div>
+            <div class="story-point">
+              <div class="story-point-badge">02</div>
+              <div>
+                <div class="story-point-title">Match on more than photos</div>
+                <div class="story-point-desc">Profiles show region, relationship goals, and compatibility markers so you understand who you are meeting.</div>
+              </div>
+            </div>
+            <div class="story-point">
+              <div class="story-point-badge">03</div>
+              <div>
+                <div class="story-point-title">Reveal the deeper reading when it matters</div>
+                <div class="story-point-desc">Once interest is mutual, unlock the full 8-Koota breakdown instead of guessing if the connection has substance.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="koota-preview-card">
+          <div class="koota-icon">N</div>
+          <div><div class="koota-name">Nadi</div><div class="koota-label">Life rhythm and energetic compatibility</div></div>
+          <div class="koota-pts">8 pts</div>
+        </div>
+        <div class="koota-preview-card">
+          <div class="koota-icon">B</div>
+          <div><div class="koota-name">Bhakoot</div><div class="koota-label">Emotional and long-term harmony</div></div>
+          <div class="koota-pts">7 pts</div>
+        </div>
+        <div class="koota-preview-card">
+          <div class="koota-icon">G</div>
+          <div><div class="koota-name">Gana</div><div class="koota-label">Temperament and behavioral fit</div></div>
+          <div class="koota-pts">6 pts</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="features-section">
+      <div class="features-inner">
+        <div class="section-label">How it works</div>
+        <div class="section-title">Simple enough to trust. Serious enough to matter.</div>
+        <div class="section-copy">You do not need to know astrology to use Ashtakoota. The app turns your birth details and profile intent into something easy to understand, so you can move from attraction to actual compatibility without friction.</div>
+        <div class="features-grid">
+          <div class="feature-card"><div class="feature-num">01</div><div class="feature-title">Build a profile people can actually read</div><div class="feature-desc">Share who you are, where you are from, what kind of relationship you want, and the kind of person you hope to meet.</div></div>
+          <div class="feature-card"><div class="feature-num">02</div><div class="feature-title">Browse people with context</div><div class="feature-desc">Instead of anonymous swiping, you see intent, profile signals, and a clearer sense of whether someone is aligned with your goals.</div></div>
+          <div class="feature-card"><div class="feature-num">03</div><div class="feature-title">Like intentionally</div><div class="feature-desc">A like means something here. Mutual interest opens the door to a more meaningful next step instead of another dead-end match.</div></div>
+          <div class="feature-card"><div class="feature-num">04</div><div class="feature-title">Unlock the compatibility reading</div><div class="feature-desc">The app calculates eight compatibility dimensions and translates them into plain-language signals you can understand quickly.</div></div>
+          <div class="feature-card"><div class="feature-num">05</div><div class="feature-title">Talk only when the match has substance</div><div class="feature-desc">Chat starts after a real signal of mutual interest, which keeps the experience calmer, safer, and less disposable.</div></div>
+          <div class="feature-card"><div class="feature-num">06</div><div class="feature-title">Keep what matters</div><div class="feature-desc">Save compatibility history, revisit promising connections, and download a polished reading when a match feels worth pursuing.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="difference-section">
+      <div class="difference-inner">
+        <div class="difference-card">
+          <div class="section-label">Why we feel different</div>
+          <div class="section-title">Built as an answer to swipe culture</div>
+          <div class="difference-list">
+            <div class="difference-row">
+              <div>
+                <div class="difference-label">Typical dating app</div>
+                <div class="difference-bad">Fast judgment, vague intentions, endless options, very little clarity.</div>
+              </div>
+              <div>
+                <div class="difference-label">Ashtakoota</div>
+                <div class="difference-good">Slower, clearer, and more intentional. You know what someone wants before you invest your time.</div>
+              </div>
+            </div>
+            <div class="difference-row">
+              <div>
+                <div class="difference-label">Typical dating app</div>
+                <div class="difference-bad">Photos lead, profile depth follows later, if ever.</div>
+              </div>
+              <div>
+                <div class="difference-label">Ashtakoota</div>
+                <div class="difference-good">Intent, compatibility, and personal substance sit next to attraction from the start.</div>
+              </div>
+            </div>
+            <div class="difference-row">
+              <div>
+                <div class="difference-label">Typical dating app</div>
+                <div class="difference-bad">Matches stack up fast and disappear faster.</div>
+              </div>
+              <div>
+                <div class="difference-label">Ashtakoota</div>
+                <div class="difference-good">Every match is meant to feel earned, contextual, and worth a second look.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="story-steps">
+          <div class="story-step">
+            <div class="story-step-num">1</div>
+            <div>
+              <div class="story-step-title">Tell us when and where you were born</div>
+              <div class="story-step-copy">The app derives your astrological markers automatically. No astrology knowledge required.</div>
+            </div>
+          </div>
+          <div class="story-step">
+            <div class="story-step-num">2</div>
+            <div>
+              <div class="story-step-title">Make your dating intent unmistakable</div>
+              <div class="story-step-copy">Your profile tells people whether you are here for marriage, long-term partnership, serious dating, or a slower exploration.</div>
+            </div>
+          </div>
+          <div class="story-step">
+            <div class="story-step-num">3</div>
+            <div>
+              <div class="story-step-title">Meet people from any background who want something real</div>
+              <div class="story-step-copy">The app is culturally rooted, but not culturally closed. Anyone who values a more intentional dating process can use it naturally.</div>
+            </div>
+          </div>
+          <div class="story-step">
+            <div class="story-step-num">4</div>
+            <div>
+              <div class="story-step-title">See whether the connection deserves your attention</div>
+              <div class="story-step-copy">You get a compatibility story, not just a score, so you can decide whether to move forward with more confidence.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-band">
+      <div class="cta-inner">
+        <div class="cta-copy">
+          <div class="section-label" style="color:var(--gold-light);">For people done with shallow matching</div>
+          <h3>Make a profile that says something real.</h3>
+          <p>Join people who want more than a dopamine loop. Build a profile with actual intent, unlock meaningful compatibility signals, and give the next connection a better chance of becoming something lasting.</p>
+        </div>
+        <div class="cta-actions">
+          <button class="btn-lg primary" onclick="openAuth('register')">Start my profile</button>
+          <button class="btn-lg outline" onclick="openAuth('login')">Sign in</button>
+        </div>
       </div>
     </div>
   </div>
