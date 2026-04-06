@@ -1,10 +1,32 @@
 const buckets = new Map();
 
+function clientIp(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (typeof forwarded === 'string' && forwarded.trim()) {
+    return forwarded.split(',')[0].trim();
+  }
+  if (typeof req.headers['cf-connecting-ip'] === 'string' && req.headers['cf-connecting-ip'].trim()) {
+    return req.headers['cf-connecting-ip'].trim();
+  }
+  if (typeof req.headers['x-real-ip'] === 'string' && req.headers['x-real-ip'].trim()) {
+    return req.headers['x-real-ip'].trim();
+  }
+  return req.ip || 'ip-unknown';
+}
+
+function requestFingerprint(req) {
+  if (req.user?.userId) return `user:${req.user.userId}`;
+  const email = String(req.body?.email || '').trim().toLowerCase();
+  const username = String(req.body?.username || '').trim().toLowerCase();
+  if (email) return `email:${email}`;
+  if (username) return `username:${username}`;
+  return `ip:${clientIp(req)}`;
+}
+
 function keyFor(req, scope) {
   return [
     scope,
-    req.user?.userId || 'anon',
-    req.ip || req.headers['x-forwarded-for'] || 'ip-unknown',
+    requestFingerprint(req),
   ].join(':');
 }
 

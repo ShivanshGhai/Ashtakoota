@@ -15,7 +15,10 @@ async function getProkeralaToken() {
     grant_type:    'client_credentials',
     client_id:     process.env.PROKERALA_CLIENT_ID,
     client_secret: process.env.PROKERALA_CLIENT_SECRET,
-  }), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
+  }), {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    timeout: 6000,
+  });
   _token = resp.data.access_token;
   _tokenExpiry = Date.now() + (resp.data.expires_in - 60) * 1000;
   return _token;
@@ -92,6 +95,7 @@ async function getBirthChart(dateStr, timeStr, lat, lng) {
           datetime,
           la: 'en',
         },
+        timeout: 7000,
       });
       const chart = resp.data.data;
       // Prokerala returns planet positions — extract Moon

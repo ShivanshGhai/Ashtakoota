@@ -106,6 +106,12 @@ function frontendUrl() {
   return process.env.FRONTEND_URL || 'http://localhost:3000';
 }
 
+function fireAndForget(label, work) {
+  Promise.resolve()
+    .then(work)
+    .catch(err => console.warn(`${label} failed:`, err.message));
+}
+
 async function getUserPhotos(userId) {
   const [rows] = await db.query(
     `SELECT PhotoURL, SortOrder, IsPrimaryPhoto
@@ -307,7 +313,7 @@ router.post('/register', rateLimit({
 
     const token = makeToken(user);
     setAuthCookie(res, token);
-    await issueVerificationForUser(user.UserID, user.Email, user.Username);
+    fireAndForget('verification email', () => issueVerificationForUser(user.UserID, user.Email, user.Username));
     return res.status(201).json({
       token,
       user: await withPhotos(user),
@@ -371,7 +377,7 @@ router.post('/resend-verification', rateLimit({
   const [[user]] = await db.query('SELECT UserID, Email, Username, EmailVerifiedAt FROM USER WHERE Email = ?', [email]);
   if (!user) return res.json({ ok: true });
   if (!user.EmailVerifiedAt) {
-    await issueVerificationForUser(user.UserID, user.Email, user.Username);
+    fireAndForget('resend verification email', () => issueVerificationForUser(user.UserID, user.Email, user.Username));
   }
   return res.json({ ok: true });
 });
@@ -405,7 +411,7 @@ router.post('/forgot-password', rateLimit({
   if (!email) return res.status(400).json({ error: 'Email required' });
   const [[user]] = await db.query('SELECT UserID, Email, Username FROM USER WHERE Email = ?', [email]);
   if (user) {
-    await issuePasswordResetForUser(user.UserID, user.Email, user.Username);
+    fireAndForget('password reset email', () => issuePasswordResetForUser(user.UserID, user.Email, user.Username));
   }
   return res.json({ ok: true });
 });
