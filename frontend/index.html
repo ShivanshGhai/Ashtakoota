@@ -1067,6 +1067,59 @@ function alignsWithDatingIntent(user) {
   return score;
 }
 
+const SIGNAL_COPY = {
+  Varna: {
+    title: 'Shared values',
+    short: 'Your priorities and relationship expectations line up well.',
+  },
+  Vashya: {
+    title: 'Natural pull',
+    short: 'There is an easy pull here instead of forced chemistry.',
+  },
+  Tara: {
+    title: 'Emotional support',
+    short: 'You are more likely to steady each other than drain each other.',
+  },
+  Yoni: {
+    title: 'Physical chemistry',
+    short: 'The attraction style looks natural, not one-sided or off-beat.',
+  },
+  GrahaMaitri: {
+    title: 'Mental sync',
+    short: 'Conversation style and emotional understanding should feel easier.',
+  },
+  Gana: {
+    title: 'Temperament fit',
+    short: 'Your personalities are more likely to work together in real life.',
+  },
+  Bhakoot: {
+    title: 'Long-term harmony',
+    short: 'This connection has a stronger chance of feeling stable over time.',
+  },
+  Nadi: {
+    title: 'Shared pace',
+    short: 'You are more likely to match each other’s rhythm and closeness needs.',
+  },
+};
+
+function matchTierLabel(label) {
+  switch ((label || '').toLowerCase()) {
+    case 'excellent': return 'Best match';
+    case 'good': return 'Great match';
+    case 'average': return 'Good match';
+    case 'poor': return 'Low match';
+    default: return label || '';
+  }
+}
+
+function simplifyReason(reason) {
+  const copy = SIGNAL_COPY[reason?.koota] || {};
+  return {
+    title: copy.title || reason?.koota || 'Compatibility signal',
+    text: copy.short || reason?.explanation || 'There is a meaningful compatibility signal here.',
+  };
+}
+
 // ── API helper ────────────────────────────────────────
 async function api(method, path, body, isFormData) {
   const opts = {
@@ -1479,7 +1532,7 @@ async function loadDashboard() {
           <div class="bm-info">
             <div class="bm-name">${escapeHtml(m.user.username)}</div>
             <div class="bm-sign">${escapeHtml(m.user.rashi)} · ${escapeHtml(m.user.nakshatra)}</div>
-            ${m.reasons?.[0] ? `<div class="bm-sign" style="margin-top:3px;">${escapeHtml(m.reasons[0].koota)}: ${escapeHtml(m.reasons[0].explanation)}</div>` : ''}
+            ${m.reasons?.[0] ? `<div class="bm-sign" style="margin-top:3px;">${escapeHtml(simplifyReason(m.reasons[0]).title)}: ${escapeHtml(simplifyReason(m.reasons[0]).text)}</div>` : ''}
           </div>
           <div class="bm-score">${escapeHtml(m.totalScore)}</div>
         </div>`).join('')
@@ -1523,9 +1576,11 @@ function profileCard(u) {
   const eval_ = u.compatEval;
   const score = eval_ ? eval_.totalScore : '—';
   const label = eval_ ? eval_.label.toLowerCase() : '';
+  const verdict = eval_ ? matchTierLabel(eval_.label) : '';
   const liked = u.liked;
   const blocked = blockedUserIds.has(u.id);
   const reasons = eval_?.reasons || [];
+  const simpleReasons = reasons.map(simplifyReason);
   const avatarContent = u.avatarURL
     ? `<img src="${API}${encodeURI(u.avatarURL)}" alt="${escapeAttr(u.username)}" style="width:100%;height:100%;object-fit:cover;" />`
     : escapeHtml(u.username[0].toUpperCase());
@@ -1539,10 +1594,10 @@ function profileCard(u) {
         <div class="profile-astro" style="margin-top:2px;">${escapeHtml(titleizeEnum(u.relationshipIntent))} · Looking for ${escapeHtml(titleizeEnum(u.lookingFor))}</div>
         <div class="profile-astro" style="margin-top:2px;">${escapeHtml(u.rashi)} · ${escapeHtml(u.nakshatra)}</div>
         <div class="profile-score-row">
-          ${eval_ ? `<span class="compat-badge ${label}">${escapeHtml(label.charAt(0).toUpperCase()+label.slice(1))}</span>` : '<span style="font-size:12px;color:var(--ink-soft);">No reading yet</span>'}
+          ${eval_ ? `<span class="compat-badge ${label}">${escapeHtml(verdict)}</span>` : '<span style="font-size:12px;color:var(--ink-soft);">No reading yet</span>'}
           <div><span class="score-num">${escapeHtml(score)}</span><span class="score-denom">${eval_ ? '/36' : ''}</span></div>
         </div>
-        ${reasons.length ? `<div class="profile-reasons">${reasons.slice(0, 2).map(reason => `<div class="profile-reason"><strong>${escapeHtml(reason.koota)}</strong>: ${escapeHtml(reason.explanation)}</div>`).join('')}</div>` : ''}
+        ${simpleReasons.length ? `<div class="profile-reasons">${simpleReasons.slice(0, 2).map(reason => `<div class="profile-reason"><strong>${escapeHtml(reason.title)}</strong>: ${escapeHtml(reason.text)}</div>`).join('')}</div>` : ''}
         <div class="profile-actions">
           <button class="like-btn ${liked?'liked':''}" id="likebtn-${u.id}" onclick="toggleLike(${u.id})" ${blocked ? 'disabled' : ''}>
             ${blocked ? 'Blocked' : liked ? '♥ Liked' : '♡ Like'}
@@ -1706,8 +1761,8 @@ async function openProfile(userId) {
            <div class="score-big">${eval_.totalScore}</div>
            <div class="score-small">/ 36</div>
          </div>
-         <span class="compat-badge ${eval_.label.toLowerCase()}" style="font-size:14px;padding:6px 16px;">${escapeHtml(eval_.label)}</span>
-         ${eval_.reasons?.length ? `<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;text-align:left;">${eval_.reasons.map(reason => `<div class="profile-reason"><strong>${escapeHtml(reason.koota)}</strong>: ${escapeHtml(reason.explanation)}</div>`).join('')}</div>` : ''}
+         <span class="compat-badge ${eval_.label.toLowerCase()}" style="font-size:14px;padding:6px 16px;">${escapeHtml(matchTierLabel(eval_.label))}</span>
+         ${eval_.reasons?.length ? `<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;text-align:left;">${eval_.reasons.map(simplifyReason).map(reason => `<div class="profile-reason"><strong>${escapeHtml(reason.title)}</strong>: ${escapeHtml(reason.text)}</div>`).join('')}</div>` : ''}
          ${eval_.evalId ? `<div style="font-size:12px;color:var(--ink-soft);margin-top:10px;cursor:pointer;" onclick="openCompat(${eval_.evalId})">View full breakdown →</div>` : '<div style="font-size:12px;color:var(--ink-soft);margin-top:10px;">Full breakdown unlocks once a reading is created.</div>'}`
       : `<div style="font-size:13px;color:var(--ink-soft);padding:1rem 0;">No reading yet.<br>Request one to see compatibility.</div>`;
 
