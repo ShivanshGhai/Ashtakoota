@@ -215,6 +215,15 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
+function removeUploadFromUrl(fileUrl) {
+  if (!fileUrl) return;
+  const filename = path.basename(fileUrl);
+  const fullPath = path.join(uploadDir, filename);
+  try {
+    if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+  } catch {}
+}
+
 router.patch('/me', auth, upload.single('avatar'), async (req, res) => {
   try {
     const { bio, profilePrompt, relationshipIntent, lookingFor } = req.body;
@@ -246,6 +255,23 @@ router.patch('/me', auth, upload.single('avatar'), async (req, res) => {
       [...Object.values(updates), req.user.userId]);
 
     return res.json({ updated: updates });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete('/me', auth, async (req, res) => {
+  try {
+    const [[user]] = await db.query('SELECT AvatarURL FROM USER WHERE UserID = ?', [req.user.userId]);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const [photoRows] = await db.query('SELECT PhotoURL FROM USER_PHOTO WHERE UserID = ?', [req.user.userId]);
+    await db.query('DELETE FROM USER WHERE UserID = ?', [req.user.userId]);
+
+    removeUploadFromUrl(user.AvatarURL);
+    photoRows.forEach(row => removeUploadFromUrl(row.PhotoURL));
+
+    return res.json({ deleted: true });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }

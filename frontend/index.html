@@ -2232,6 +2232,11 @@ function renderMyProfile() {
         <input type="file" id="edit-avatar" accept="image/*" />
       </div>
       <button class="btn-primary" onclick="saveProfile()">Save changes</button>
+      <div style="margin-top:1.75rem;padding-top:1.25rem;border-top:.5px solid var(--border);max-width:700px;">
+        <div class="card-title" style="color:var(--accent-red);margin-bottom:.5rem;">Danger zone</div>
+        <div style="font-size:13px;color:var(--ink-soft);line-height:1.7;margin-bottom:.9rem;">Delete your profile, matches, messages, readings, and stored photos permanently.</div>
+        <button class="btn-danger" onclick="deleteProfile()">Delete profile</button>
+      </div>
     </div>`;
 }
 
@@ -2256,6 +2261,24 @@ async function saveProfile() {
     renderMyProfile();
     toast('Profile updated ✦');
   } catch (e) { toast('Error: ' + e.message); }
+}
+
+async function deleteProfile() {
+  if (!currentUser) return;
+  const confirmed = window.confirm('Delete your profile permanently? This will remove your photos, matches, chats, and compatibility history.');
+  if (!confirmed) return;
+  const typed = window.prompt('Type DELETE to confirm profile deletion.');
+  if (typed !== 'DELETE') {
+    toast('Profile deletion cancelled');
+    return;
+  }
+  try {
+    await api('DELETE', '/api/users/me');
+    await doLogout(true);
+    toast('Profile deleted');
+  } catch (e) {
+    toast('Failed to delete profile: ' + e.message);
+  }
 }
 
 // ── NOTIFICATIONS ─────────────────────────────────────
