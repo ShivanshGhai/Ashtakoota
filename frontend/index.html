@@ -1298,7 +1298,43 @@ async function doRegister() {
   const btn = document.getElementById('register-btn');
   const err = document.getElementById('register-error');
   err.classList.remove('show');
+  const usernameInput = document.getElementById('reg-username');
+  const emailInput = document.getElementById('reg-email');
+  const passwordInput = document.getElementById('reg-password');
+  const genderInput = document.getElementById('reg-gender');
+  const lookingForInput = document.getElementById('reg-looking-for');
+  const intentInput = document.getElementById('reg-intent');
+  const dobInput = document.getElementById('reg-dob');
+  const tobInput = document.getElementById('reg-tob');
+  const locationInput = document.getElementById('reg-location');
+  const safetyInput = document.getElementById('reg-safety');
+  const username = usernameInput.value.trim();
+  const email = emailInput.value.trim();
   const photoFiles = Array.from(document.getElementById('reg-photos').files || []);
+
+  if (!username || !email || !passwordInput.value || !genderInput.value || !lookingForInput.value || !intentInput.value || !dobInput.value || !tobInput.value || !locationInput.value.trim()) {
+    err.textContent = 'Fill in all required fields before creating your profile.';
+    err.classList.add('show');
+    return;
+  }
+  if (!emailInput.checkValidity()) {
+    err.textContent = 'Enter a valid email address.';
+    err.classList.add('show');
+    emailInput.focus();
+    return;
+  }
+  if (passwordInput.value.length < 8) {
+    err.textContent = 'Password must be at least 8 characters.';
+    err.classList.add('show');
+    passwordInput.focus();
+    return;
+  }
+  if (!safetyInput.checked) {
+    err.textContent = 'You must confirm you are 18+ and agree to respectful conduct.';
+    err.classList.add('show');
+    safetyInput.focus();
+    return;
+  }
 
   // Validate city was selected from dropdown
   const lat = document.getElementById('reg-lat').value;
@@ -1306,7 +1342,7 @@ async function doRegister() {
   if (!lat || !lng) {
     err.textContent = 'Please select your birth city from the dropdown list so coordinates can be set automatically.';
     err.classList.add('show');
-    document.getElementById('reg-location').focus();
+    locationInput.focus();
     return;
   }
   if (photoFiles.length < 4) {
@@ -1319,20 +1355,20 @@ async function doRegister() {
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Calculating chart…';
   try {
     const fd = new FormData();
-    fd.append('username',      document.getElementById('reg-username').value.trim());
-    fd.append('email',         document.getElementById('reg-email').value.trim());
-    fd.append('password',      document.getElementById('reg-password').value);
-    fd.append('genderIdentity', document.getElementById('reg-gender').value);
-    fd.append('lookingFor', document.getElementById('reg-looking-for').value);
-    fd.append('relationshipIntent', document.getElementById('reg-intent').value);
-    fd.append('dateOfBirth',   document.getElementById('reg-dob').value);
-    fd.append('timeOfBirth',   document.getElementById('reg-tob').value);
-    fd.append('birthLocation', document.getElementById('reg-location').value.trim());
+    fd.append('username',      username);
+    fd.append('email',         email);
+    fd.append('password',      passwordInput.value);
+    fd.append('genderIdentity', genderInput.value);
+    fd.append('lookingFor', lookingForInput.value);
+    fd.append('relationshipIntent', intentInput.value);
+    fd.append('dateOfBirth',   dobInput.value);
+    fd.append('timeOfBirth',   tobInput.value);
+    fd.append('birthLocation', locationInput.value.trim());
     fd.append('latitude',      lat);
     fd.append('longitude',     lng);
     fd.append('bio',           document.getElementById('reg-bio').value);
     fd.append('profilePrompt', document.getElementById('reg-prompt').value);
-    fd.append('safetyConsent', document.getElementById('reg-safety').checked ? 'true' : 'false');
+    fd.append('safetyConsent', safetyInput.checked ? 'true' : 'false');
     photoFiles.forEach(file => fd.append('photos', file));
 
     const data = await api('POST', '/api/auth/register', fd, true);
@@ -1357,7 +1393,7 @@ async function doRegister() {
     err.textContent = e.message;
     err.classList.add('show');
   } finally {
-    btn.disabled = false; btn.textContent = 'Create account & see your chart';
+    btn.disabled = false; btn.textContent = 'Start my profile & see my chart';
   }
 }
 
