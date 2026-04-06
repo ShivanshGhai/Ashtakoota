@@ -2,7 +2,7 @@
 const router = require('express').Router();
 const db     = require('../config/db');
 const auth   = require('../middleware/auth');
-const { sanitizeUser } = require('./auth');
+const { sanitizeUser, getUserPhotos } = require('./auth');
 const { visibleUserFilterSql, isBlockedEitherWay } = require('../utils/safety');
 const { normalizeAvatar, normalizePlainText, stripHtml } = require('../utils/security');
 const { calculateAshtakoota } = require('../utils/koota');
@@ -181,9 +181,14 @@ router.get('/:id', auth, async (req, res) => {
     const [[currentUser]] = await db.query(USER_SELECT + ' WHERE u.UserID = ?', [req.user.userId]);
     if (!currentUser) return res.status(404).json({ error: 'User not found' });
     const compat = computeCompat(currentUser, user);
+    const photos = await getUserPhotos(user.UserID);
 
     return res.json({
-      user: sanitizeUser(user, { includePrivate: false }),
+      user: {
+        ...sanitizeUser(user, { includePrivate: false }),
+        photos,
+        photoCount: photos.length,
+      },
       compatEval: {
         evalId:     evalRow?.EvalID || null,
         totalScore: compat.totalScore,

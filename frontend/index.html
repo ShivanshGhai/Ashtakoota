@@ -365,6 +365,12 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
 .detail-info{flex:1;}
 .detail-info h3{font-family:var(--font-display);font-size:26px;font-weight:600;}
 .detail-meta{font-size:13px;color:var(--ink-soft);margin-top:2px;}
+.detail-gallery{margin-top:14px;}
+.detail-gallery-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:8px;}
+.detail-gallery-strip{display:flex;gap:10px;flex-wrap:wrap;}
+.detail-gallery-photo{width:74px;height:92px;border-radius:16px;overflow:hidden;border:1px solid var(--border);background:var(--parchment-mid);box-shadow:0 8px 24px rgba(0,0,0,.18);}
+.detail-gallery-photo.primary{border-color:var(--border-strong);}
+.detail-gallery-photo img{width:100%;height:100%;object-fit:cover;display:block;}
 .astro-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
 .astro-tag{background:var(--parchment-mid);color:var(--ink-mid);font-size:12px;padding:4px 12px;border-radius:20px;}
 .detail-grid{display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;}
@@ -428,6 +434,9 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
   .chat-list{display:none;}
   .main-content{padding:1rem 1rem 6rem;}
   .section{padding:1.1rem;border-radius:20px;}
+  .detail-header{padding:1.3rem;gap:14px;}
+  .detail-gallery-strip{gap:8px;}
+  .detail-gallery-photo{width:58px;height:74px;border-radius:14px;}
   .mobile-nav{position:fixed;left:0;right:0;bottom:0;z-index:250;display:grid;grid-template-columns:repeat(5,1fr);background:rgba(23,19,17,.95);backdrop-filter:blur(14px);border-top:.5px solid var(--border-strong);}
 }
 @media(max-width:980px){
@@ -444,6 +453,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
   .how-hero-grid{grid-template-columns:1fr;}
   .difference-inner{grid-template-columns:1fr;}
   .signal-grid{grid-template-columns:1fr;}
+  .detail-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -1125,6 +1135,28 @@ function simplifyReason(reason) {
   };
 }
 
+function getOrderedPhotos(user) {
+  if (Array.isArray(user?.photos) && user.photos.length) return user.photos;
+  if (user?.avatarURL) return [{ url: user.avatarURL, isPrimary: true, sortOrder: 0 }];
+  return [];
+}
+
+function renderPhotoGallery(user, label = 'Profile gallery') {
+  const photos = getOrderedPhotos(user);
+  if (!photos.length) return '';
+  return `
+    <div class="detail-gallery">
+      <div class="detail-gallery-label">${escapeHtml(label)} · ${photos.length} ${photos.length === 1 ? 'photo' : 'photos'}</div>
+      <div class="detail-gallery-strip">
+        ${photos.map(photo => `
+          <div class="detail-gallery-photo ${photo.isPrimary ? 'primary' : ''}">
+            <img src="${API}${encodeURI(photo.url)}" alt="${escapeAttr(user.username)} photo" />
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
 // ── API helper ────────────────────────────────────────
 async function api(method, path, body, isFormData) {
   const opts = {
@@ -1785,6 +1817,7 @@ async function openProfile(userId) {
           <span class="astro-tag">${escapeHtml(u.yoni)} Yoni</span>
           <span class="astro-tag">${escapeHtml(u.varna)}</span>
         </div>
+        ${renderPhotoGallery(u, 'Profile photos')}
       </div>`;
 
     document.getElementById('profile-detail-astro').innerHTML = [
@@ -2162,6 +2195,7 @@ function renderMyProfile() {
           <span class="astro-tag">${escapeHtml(u.yoni)} Yoni</span>
           <span class="astro-tag">${escapeHtml(u.varna)}</span>
         </div>
+        ${renderPhotoGallery(u, 'Your photos')}
       </div>
     </div>
     <div class="card" style="margin-top:1.5rem;">

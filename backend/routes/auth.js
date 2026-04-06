@@ -106,6 +106,31 @@ function frontendUrl() {
   return process.env.FRONTEND_URL || 'http://localhost:3000';
 }
 
+async function getUserPhotos(userId) {
+  const [rows] = await db.query(
+    `SELECT PhotoURL, SortOrder, IsPrimaryPhoto
+     FROM USER_PHOTO
+     WHERE UserID = ?
+     ORDER BY IsPrimaryPhoto DESC, SortOrder ASC, PhotoID ASC`,
+    [userId]
+  );
+  return rows.map(row => ({
+    url: row.PhotoURL,
+    sortOrder: row.SortOrder,
+    isPrimary: !!row.IsPrimaryPhoto,
+  }));
+}
+
+async function withPhotos(user, options = {}) {
+  const base = sanitizeUser(user, options);
+  const photos = await getUserPhotos(user.UserID);
+  return {
+    ...base,
+    photos,
+    photoCount: photos.length,
+  };
+}
+
 async function issueVerificationForUser(userId, email, username) {
   const token = randomToken();
   const tokenHash = hashToken(token);
@@ -285,7 +310,7 @@ router.post('/register', rateLimit({
     await issueVerificationForUser(user.UserID, user.Email, user.Username);
     return res.status(201).json({
       token,
-      user: sanitizeUser(user),
+      user: await withPhotos(user),
       chart: { ...chart, rashiName: user.RashiName, nakshatraName: user.NakshatraName },
     });
   } catch (err) {
@@ -324,7 +349,7 @@ router.post('/login', rateLimit({
 
     const token = makeToken(user);
     setAuthCookie(res, token);
-    return res.json({ token, user: sanitizeUser(user) });
+    return res.json({ token, user: await withPhotos(user) });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -420,7 +445,7 @@ router.get('/me', requireAuth, async (req, res) => {
      WHERE u.UserID = ?`, [req.user.userId]
   );
   if (!user) return res.status(404).json({ error: 'User not found' });
-  return res.json({ user: sanitizeUser(user) });
+  return res.json({ user: await withPhotos(user) });
 });
 
 function sanitizeUser(u, options = {}) {
@@ -478,3 +503,5 @@ function sanitizeUser(u, options = {}) {
 
 module.exports = router;
 module.exports.sanitizeUser = sanitizeUser;
+module.exports.getUserPhotos = getUserPhotos;
+module.exports.withPhotos = withPhotos;
