@@ -2064,7 +2064,7 @@ async function loadDashboard() {
   try {
     const [matchData, histData, bestData, browseData] = await Promise.all([
       api('GET', '/api/matches/list'),
-      api('GET', `/api/compatibility/${currentUser.id}/history`),
+      api('GET', '/api/compatibility/history'),
       api('GET', '/api/users/best-matches'),
       api('GET', '/api/users?limit=4'),
     ]);

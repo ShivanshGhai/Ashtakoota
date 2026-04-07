@@ -416,13 +416,17 @@ router.post('/forgot-password', rateLimit({
   scope: 'forgot-password',
   message: 'Too many password reset requests. Please try again later.',
 }), async (req, res) => {
-  const email = normalizeEmail(req.body.email);
-  if (!email) return res.status(400).json({ error: 'Email required' });
-  const [[user]] = await db.query('SELECT UserID, Email, Username FROM USER WHERE Email = ?', [email]);
-  if (user) {
-    fireAndForget('password reset email', () => issuePasswordResetForUser(user.UserID, user.Email, user.Username));
+  try {
+    const email = normalizeEmail(req.body.email);
+    if (!email) return res.status(400).json({ error: 'Email required' });
+    const [[user]] = await db.query('SELECT UserID, Email, Username FROM USER WHERE Email = ?', [email]);
+    if (user) {
+      await issuePasswordResetForUser(user.UserID, user.Email, user.Username);
+    }
+    return res.json({ ok: true });
+  } catch (err) {
+    return res.status(502).json({ error: `Password reset email could not be sent: ${err.message}` });
   }
-  return res.json({ ok: true });
 });
 
 router.post('/reset-password', async (req, res) => {

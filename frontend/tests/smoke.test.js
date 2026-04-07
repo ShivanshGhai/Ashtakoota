@@ -19,5 +19,7 @@ const missingIds = referencedIds.filter(id => !ids.has(id));
 assert.deepStrictEqual(missingIds, [], `all getElementById references should exist in index.html; missing: ${missingIds.join(', ')}`);
 assert(html.includes("['localhost', '127.0.0.1'].includes(window.location.hostname)"), 'local API fallback should cover localhost and 127.0.0.1');
 assert(html.includes('function parseNotificationPayload(payload)'), 'notification payload parsing should be defensive');
+assert(scriptMatch[1].includes("api('GET', '/api/compatibility/history')"), 'dashboard should use the supported compatibility history endpoint');
+assert(!scriptMatch[1].includes('/api/compatibility/${currentUser.id}/history'), 'dashboard should not call a non-existent per-user history route');
 
 console.log('frontend smoke test passed');
