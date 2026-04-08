@@ -4,6 +4,8 @@ const bcrypt  = require('bcrypt');
 const crypto  = require('crypto');
 const jwt     = require('jsonwebtoken');
 const db      = require('../config/db');
+const requireAuth = require('../middleware/auth');
+const { extractToken } = require('../middleware/auth');
 const { getBirthChart } = require('../utils/astrology');
 const mailer  = require('../utils/mailer');
 const multer  = require('multer');
@@ -106,6 +108,16 @@ function frontendUrl() {
   return process.env.FRONTEND_URL || 'http://localhost:3000';
 }
 
+function tryAuth(req) {
+  const token = extractToken(req);
+  if (!token) return null;
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET);
+  } catch {
+    return null;
+  }
+}
+
 function fireAndForget(label, work) {
   Promise.resolve()
     .then(work)
@@ -140,17 +152,19 @@ async function withPhotos(user, options = {}) {
 async function issueVerificationForUser(userId, email, username) {
   const token = randomToken();
   const tokenHash = hashToken(token);
+  const verificationUrl = `${frontendUrl()}/?verify=${encodeURIComponent(token)}`;
   await db.query(
     `UPDATE USER
      SET EmailVerifyTokenHash = ?, EmailVerifyExpiresAt = DATE_ADD(NOW(), INTERVAL 24 HOUR)
      WHERE UserID = ?`,
     [tokenHash, userId]
   );
-  await mailer.sendVerificationEmail(
-    email,
-    username,
-    `${frontendUrl()}/?verify=${encodeURIComponent(token)}`
-  );
+  try {
+    await mailer.sendVerificationEmail(email, username, verificationUrl);
+    return { sent: true };
+  } catch (error) {
+    return { sent: false, verificationUrl, error };
+  }
 }
 
 async function issuePasswordResetForUser(userId, email, username) {
@@ -307,12 +321,9 @@ router.post('/register', rateLimit({
        WHERE u.UserID = ?`, [result.insertId]
     );
 
-    let verificationEmailSent = true;
-    try {
-      await issueVerificationForUser(user.UserID, user.Email, user.Username);
-    } catch (err) {
-      verificationEmailSent = false;
-      console.warn('verification email failed:', err.message);
+    const verification = await issueVerificationForUser(user.UserID, user.Email, user.Username);
+    if (!verification.sent && verification.error) {
+      console.warn('verification email failed:', verification.error.message);
     }
 
     const token = makeToken(user);
@@ -321,7 +332,8 @@ router.post('/register', rateLimit({
       token,
       user: await withPhotos(user),
       chart: { ...chart, rashiName: user.RashiName, nakshatraName: user.NakshatraName },
-      verificationEmailSent,
+      verificationEmailSent: verification.sent,
+      verificationUrl: verification.sent ? null : verification.verificationUrl,
     });
   } catch (err) {
     cleanupUploadedFiles(req.files);
@@ -379,11 +391,30 @@ router.post('/resend-verification', rateLimit({
   try {
     const email = normalizeEmail(req.body.email);
     if (!email) return res.status(400).json({ error: 'Email required' });
+    const auth = tryAuth(req);
     const [[user]] = await db.query('SELECT UserID, Email, Username, EmailVerifiedAt FROM USER WHERE Email = ?', [email]);
     if (!user) return res.json({ ok: true });
     if (!user.EmailVerifiedAt) {
-      await issueVerificationForUser(user.UserID, user.Email, user.Username);
-      return res.json({ ok: true, sent: true });
+      const verification = await issueVerificationForUser(user.UserID, user.Email, user.Username);
+      if (verification.sent) {
+        return res.json({ ok: true, sent: true });
+      }
+
+      const requesterMatchesUser = auth
+        && auth.userId === user.UserID
+        && String(auth.email || '').toLowerCase() === String(user.Email || '').toLowerCase();
+
+      if (requesterMatchesUser) {
+        return res.json({
+          ok: true,
+          sent: false,
+          fallback: true,
+          verificationUrl: verification.verificationUrl,
+          message: verification.error?.message || 'Verification email unavailable',
+        });
+      }
+
+      throw verification.error || new Error('Verification email could not be sent');
     }
     return res.json({ ok: true, sent: false, alreadyVerified: true });
   } catch (err) {
@@ -452,7 +483,6 @@ router.post('/reset-password', async (req, res) => {
 });
 
 // ── GET /api/auth/me ──────────────────────────────────────────────────────
-const requireAuth = require('../middleware/auth');
 router.get('/me', requireAuth, async (req, res) => {
   const [[user]] = await db.query(
     `SELECT u.*, r.RashiName, r.Varna, r.VashyaGroup, n.NakshatraName, n.Index1to27,

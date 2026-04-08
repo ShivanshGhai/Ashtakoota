@@ -1843,6 +1843,14 @@ function toast(msg, duration = 3000) {
   setTimeout(() => t.classList.remove('show'), duration);
 }
 
+function openVerificationFallback(url, message = 'Email delivery is unavailable. Opening your verification link directly.') {
+  if (!url) return;
+  toast(message, 4500);
+  setTimeout(() => {
+    window.location.assign(url);
+  }, 900);
+}
+
 // ── Page routing ──────────────────────────────────────
 const PAGE_PATHS = {
   landing: '/',
@@ -2164,14 +2172,16 @@ async function doRegister() {
     currentUser = data.user;
     const verificationEmail = currentUser.email;
     const verificationEmailSent = data.verificationEmailSent !== false;
+    const verificationUrl = data.verificationUrl || null;
     setTimeout(() => {
       afterLogin();
-      toast(
-        verificationEmailSent
-          ? `Profile created. Verify ${verificationEmail} to unlock likes, chat, and requests.`
-          : `Profile created, but the verification email could not be sent. Use Resend verification after login once mail is fixed.`,
-        6000
-      );
+      if (verificationEmailSent) {
+        toast(`Profile created. Verify ${verificationEmail} to unlock likes, chat, and requests.`, 6000);
+      } else if (verificationUrl) {
+        openVerificationFallback(verificationUrl, 'Profile created. Email delivery is unavailable, so your verification link will open directly.');
+      } else {
+        toast(`Profile created, but the verification email could not be sent. Use Resend verification after login once mail is fixed.`, 6000);
+      }
     }, 1200);
   } catch (e) {
     err.textContent = e.message;
@@ -2187,6 +2197,10 @@ async function resendVerification() {
     const data = await api('POST', '/api/auth/resend-verification', { email: currentUser.email });
     if (data?.alreadyVerified) {
       toast('This email is already verified.');
+      return;
+    }
+    if (data?.verificationUrl) {
+      openVerificationFallback(data.verificationUrl, 'Email delivery is unavailable, so your verification link will open directly.');
       return;
     }
     toast(`Verification email sent to ${currentUser.email}`);
