@@ -125,6 +125,29 @@ nav{position:sticky;top:0;z-index:100;background:rgba(18,11,13,0.88);backdrop-fi
 .public-section-inner{max-width:1100px;margin:0 auto;}
 .public-grid-two{display:grid;grid-template-columns:1.02fr .98fr;gap:1.75rem;align-items:start;}
 .public-stack{display:grid;gap:16px;}
+.landing-carousel-band{padding:1.25rem 2rem 5.25rem;}
+.landing-carousel-shell{max-width:1100px;margin:0 auto;padding:30px;border:1px solid rgba(213,154,133,.16);border-radius:30px;background:linear-gradient(180deg, rgba(34,24,27,.96), rgba(20,14,16,.98));box-shadow:var(--shadow-hero);overflow:hidden;}
+.landing-carousel-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:1.75rem;}
+.landing-carousel-copy{max-width:640px;}
+.landing-carousel-label{display:inline-flex;align-items:center;gap:10px;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:.9rem;}
+.landing-carousel-label::before{content:'';width:18px;height:1px;background:rgba(213,154,133,.42);}
+.landing-carousel-title{font-family:var(--font-display);font-size:42px;line-height:.95;color:var(--ink);margin-bottom:.75rem;}
+.landing-carousel-subtitle{font-size:15px;line-height:1.85;color:var(--ink-soft);}
+.landing-carousel-controls{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.landing-carousel-btn{width:42px;height:42px;border-radius:50%;border:1px solid rgba(213,154,133,.24);background:rgba(18,11,13,.78);color:var(--ink);font-size:17px;cursor:pointer;transition:transform var(--ease-premium),border-color var(--ease-premium),background var(--ease-premium);}
+.landing-carousel-btn:hover{transform:translateY(-2px);border-color:rgba(213,154,133,.48);background:rgba(49,33,37,.96);}
+.landing-carousel-viewport{overflow:hidden;}
+.landing-carousel-track{display:flex;transition:transform 480ms ease;}
+.landing-carousel-slide{min-width:100%;display:grid;grid-template-columns:minmax(0,.95fr) minmax(320px,1.05fr);gap:1.5rem;align-items:start;}
+.landing-carousel-card{padding:26px;border-radius:24px;border:1px solid rgba(213,154,133,.12);background:linear-gradient(180deg, rgba(49,33,37,.92), rgba(30,21,24,.96));box-shadow:var(--shadow-card);}
+.landing-carousel-card .section-title{margin-bottom:.8rem;font-size:38px;}
+.landing-carousel-card .section-copy{margin-bottom:0;max-width:none;}
+.landing-carousel-panel{display:grid;gap:14px;}
+.landing-carousel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.landing-carousel-dots{display:flex;gap:10px;justify-content:center;margin-top:1.5rem;}
+.landing-carousel-dot{width:10px;height:10px;border-radius:50%;border:none;padding:0;background:rgba(244,233,222,.24);cursor:pointer;transition:transform var(--ease-premium),background var(--ease-premium);}
+.landing-carousel-dot.active{background:var(--rose-gold-soft);transform:scale(1.15);}
+.landing-carousel-dot:hover{background:rgba(213,154,133,.72);}
 .trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
 .public-footer{border-top:1px solid rgba(213,154,133,.12);background:rgba(12,8,9,.96);padding:1.6rem 2rem 2rem;}
 .public-footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
@@ -517,8 +540,12 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
   .hero-text h1{max-width:none;}
   .hero-visual{display:none;}
   .teaser-strip{grid-template-columns:1fr;padding:0 1.25rem 2.5rem;}
-  .trust-grid{grid-template-columns:1fr;}
-  .public-grid-two{grid-template-columns:1fr;}
+  .trust-grid,.landing-carousel-grid,.public-grid-two,.landing-carousel-slide{grid-template-columns:1fr;}
+  .landing-carousel-band{padding:1rem 1.25rem 4rem;}
+  .landing-carousel-shell{padding:22px;}
+  .landing-carousel-head{flex-direction:column;align-items:flex-start;}
+  .landing-carousel-title{font-size:34px;}
+  .landing-carousel-card .section-title{font-size:30px;}
   .app-layout{grid-template-columns:1fr;}.sidebar{display:none;}
   .features-grid{grid-template-columns:1fr;}
   .difference-inner{grid-template-columns:1fr;}
@@ -557,13 +584,14 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
   .hero-visual{width:100%;}
   .teaser-strip{grid-template-columns:1fr;padding:0 1.25rem 2.5rem;}
   .public-section{padding:5rem 1.25rem;}
+  .landing-carousel-band{padding:1rem 1.25rem 4rem;}
   .cta-inner{flex-direction:column;align-items:flex-start;}
   .cta-actions{width:100%;}
   .cta-actions .btn-lg{width:100%;text-align:center;}
   .how-hero{padding:3rem 1.25rem 2.25rem;}
   .how-hero-grid{grid-template-columns:1fr;}
   .difference-inner{grid-template-columns:1fr;}
-  .signal-grid{grid-template-columns:1fr;}
+  .signal-grid,.landing-carousel-slide,.landing-carousel-grid{grid-template-columns:1fr;}
   .detail-grid{grid-template-columns:1fr;}
 }
 @media(max-width:560px){
@@ -572,6 +600,10 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
   .profile-astro{font-size:11px;}
   .profile-score-row{align-items:flex-start;gap:10px;flex-direction:column;}
   .mobile-nav-item{padding:9px 4px;font-size:10px;}
+  .landing-carousel-shell{padding:18px;}
+  .landing-carousel-card{padding:20px;}
+  .landing-carousel-title{font-size:30px;}
+  .landing-carousel-card .section-title{font-size:28px;}
 }
 </style>
 </head>
@@ -659,113 +691,127 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
       </div>
     </div>
 
-    <section class="public-section ink">
-      <div class="public-section-inner">
-        <div class="section-label">Why this is different</div>
-        <div class="section-title">Built for people who want direction, not just dopamine.</div>
-        <div class="section-copy">Ashtakoota does not pretend volume is the same thing as value. It slows the pace, puts intent on the profile, and makes compatibility easier to understand before you burn time on a connection that never had shape.</div>
-        <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-num">01</div>
-            <div class="feature-title">Intent before intrigue</div>
-            <div class="feature-desc">Profiles tell you what someone is here for before you start projecting your own meaning onto mixed signals.</div>
+    <section class="landing-carousel-band">
+      <div class="landing-carousel-shell" id="landing-carousel" aria-label="Landing highlights carousel">
+        <div class="landing-carousel-head">
+          <div class="landing-carousel-copy">
+            <div class="landing-carousel-label">A shorter, clearer landing page</div>
+            <div class="landing-carousel-title">Everything important, without four long scroll stops.</div>
+            <div class="landing-carousel-subtitle">The homepage now loops through the same key ideas in one moving band, so the story stays intact without turning the landing experience into a marathon.</div>
           </div>
-          <div class="feature-card">
-            <div class="feature-num">02</div>
-            <div class="feature-title">Compatibility with context</div>
-            <div class="feature-desc">The reading is not random mysticism. It is a structured system translated into modern relationship language.</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-num">03</div>
-            <div class="feature-title">Slower, more deliberate contact</div>
-            <div class="feature-desc">Even the first message asks for more care than “hey”, so the app filters out a lot of low-effort behavior early.</div>
+          <div class="landing-carousel-controls">
+            <button class="landing-carousel-btn" type="button" aria-label="Previous slide" onclick="moveLandingCarousel(-1)">←</button>
+            <button class="landing-carousel-btn" type="button" aria-label="Next slide" onclick="moveLandingCarousel(1)">→</button>
           </div>
         </div>
-      </div>
-    </section>
-
-    <section class="public-section noir">
-      <div class="public-section-inner">
-        <div class="section-label">Why people stay</div>
-        <div class="section-title">It makes dating feel calmer.</div>
-        <div class="section-copy">You spend less time decoding, less time second-guessing, and more time deciding whether the person in front of you is actually worth taking seriously.</div>
-        <div class="trust-grid">
-          <div class="teaser-card">
-            <div class="teaser-title">Clarity reduces noise</div>
-            <div class="teaser-copy">Profiles carry relationship intent, so ambiguity is no longer the default mood of the app.</div>
-          </div>
-          <div class="teaser-card">
-            <div class="teaser-title">Better filtering, earlier</div>
-            <div class="teaser-copy">Compatibility context appears before you overinvest, which changes who feels worth a second look.</div>
-          </div>
-          <div class="teaser-card">
-            <div class="teaser-title">A wider lens than chemistry</div>
-            <div class="teaser-copy">Attraction still matters. It just no longer has to do all the work by itself.</div>
+        <div class="landing-carousel-viewport">
+          <div class="landing-carousel-track" id="landing-carousel-track">
+            <article class="landing-carousel-slide">
+              <div class="landing-carousel-card">
+                <div class="section-label">Why this is different</div>
+                <div class="section-title">Built for people who want direction, not just dopamine.</div>
+                <div class="section-copy">Ashtakoota does not pretend volume is the same thing as value. It slows the pace, puts intent on the profile, and makes compatibility easier to understand before you burn time on a connection that never had shape.</div>
+              </div>
+              <div class="landing-carousel-panel landing-carousel-grid">
+                <div class="feature-card">
+                  <div class="feature-num">01</div>
+                  <div class="feature-title">Intent before intrigue</div>
+                  <div class="feature-desc">Profiles tell you what someone is here for before you start projecting your own meaning onto mixed signals.</div>
+                </div>
+                <div class="feature-card">
+                  <div class="feature-num">02</div>
+                  <div class="feature-title">Compatibility with context</div>
+                  <div class="feature-desc">The reading is not random mysticism. It is a structured system translated into modern relationship language.</div>
+                </div>
+                <div class="feature-card">
+                  <div class="feature-num">03</div>
+                  <div class="feature-title">Slower, more deliberate contact</div>
+                  <div class="feature-desc">Even the first message asks for more care than “hey”, so the app filters out a lot of low-effort behavior early.</div>
+                </div>
+              </div>
+            </article>
+            <article class="landing-carousel-slide">
+              <div class="landing-carousel-card">
+                <div class="section-label">Why people stay</div>
+                <div class="section-title">It makes dating feel calmer.</div>
+                <div class="section-copy">You spend less time decoding, less time second-guessing, and more time deciding whether the person in front of you is actually worth taking seriously.</div>
+              </div>
+              <div class="landing-carousel-panel landing-carousel-grid">
+                <div class="teaser-card">
+                  <div class="teaser-title">Clarity reduces noise</div>
+                  <div class="teaser-copy">Profiles carry relationship intent, so ambiguity is no longer the default mood of the app.</div>
+                </div>
+                <div class="teaser-card">
+                  <div class="teaser-title">Better filtering, earlier</div>
+                  <div class="teaser-copy">Compatibility context appears before you overinvest, which changes who feels worth a second look.</div>
+                </div>
+                <div class="teaser-card">
+                  <div class="teaser-title">A wider lens than chemistry</div>
+                  <div class="teaser-copy">Attraction still matters. It just no longer has to do all the work by itself.</div>
+                </div>
+              </div>
+            </article>
+            <article class="landing-carousel-slide">
+              <div class="landing-carousel-card">
+                <div class="section-label">How it works</div>
+                <div class="section-title">Simple flow. Less chaos.</div>
+                <div class="section-copy">Create a serious profile, add your birth details once, and browse people with far more context than a swipe stack gives you. When the interest is mutual, the deeper reading becomes available.</div>
+              </div>
+              <div class="landing-carousel-panel">
+                <div class="story-step">
+                  <div class="story-step-num">1</div>
+                  <div>
+                    <div class="story-step-title">Create a profile with intent</div>
+                    <div class="story-step-copy">Say what you want, who you want to meet, and what kind of connection you are genuinely open to.</div>
+                  </div>
+                </div>
+                <div class="story-step">
+                  <div class="story-step-num">2</div>
+                  <div>
+                    <div class="story-step-title">Let the app derive the signals</div>
+                    <div class="story-step-copy">Birth details are used once so compatibility markers can be translated into plain-English relationship cues.</div>
+                  </div>
+                </div>
+                <div class="story-step">
+                  <div class="story-step-num">3</div>
+                  <div>
+                    <div class="story-step-title">Only go deeper when it matters</div>
+                    <div class="story-step-copy">The strongest detail reveals itself after interest becomes mutual instead of overwhelming the first impression.</div>
+                  </div>
+                </div>
+              </div>
+            </article>
+            <article class="landing-carousel-slide">
+              <div class="landing-carousel-card">
+                <div class="section-label">Compatibility, explained</div>
+                <div class="section-title">Eight signals. Human meaning first.</div>
+                <div class="section-copy">You do not need to know the traditional framework before the product becomes useful. Ashtakoota translates compatibility into shared pace, long-term harmony, emotional support, values fit, and other relationship signals that are easier to understand in real life.</div>
+              </div>
+              <div class="landing-carousel-panel">
+                <div class="signal-card">
+                  <div class="signal-tag">Signal example</div>
+                  <div class="signal-name">Shared pace</div>
+                  <div class="signal-copy">How naturally two people move through closeness, stress, and everyday emotional rhythm.</div>
+                </div>
+                <div class="signal-card">
+                  <div class="signal-tag">Signal example</div>
+                  <div class="signal-name">Long-term harmony</div>
+                  <div class="signal-copy">Whether the connection has a steadier emotional foundation over time instead of relying on short-term chemistry alone.</div>
+                </div>
+                <div class="signal-card">
+                  <div class="signal-tag">Inspired by</div>
+                  <div class="signal-name">Ashtakoota tradition</div>
+                  <div class="signal-copy">Culturally rooted, translated for a modern dating product, and designed to feel useful even if this is your first exposure to the framework.</div>
+                </div>
+              </div>
+            </article>
           </div>
         </div>
-      </div>
-    </section>
-
-    <section class="public-section ink">
-      <div class="public-section-inner public-grid-two">
-        <div>
-          <div class="section-label">How it works</div>
-          <div class="section-title">Simple flow. Less chaos.</div>
-          <div class="section-copy">Create a serious profile, add your birth details once, and browse people with far more context than a swipe stack gives you. When the interest is mutual, the deeper reading becomes available.</div>
-          <div class="cta-actions">
-            <button class="btn-lg primary" onclick="openAuth('register')">Get started</button>
-            <button class="btn-lg outline" onclick="goTo('how')">See the full walkthrough</button>
-          </div>
-        </div>
-        <div class="public-stack">
-          <div class="story-step">
-            <div class="story-step-num">1</div>
-            <div>
-              <div class="story-step-title">Create a profile with intent</div>
-              <div class="story-step-copy">Say what you want, who you want to meet, and what kind of connection you are genuinely open to.</div>
-            </div>
-          </div>
-          <div class="story-step">
-            <div class="story-step-num">2</div>
-            <div>
-              <div class="story-step-title">Let the app derive the signals</div>
-              <div class="story-step-copy">Birth details are used once so compatibility markers can be translated into plain-English relationship cues.</div>
-            </div>
-          </div>
-          <div class="story-step">
-            <div class="story-step-num">3</div>
-            <div>
-              <div class="story-step-title">Only go deeper when it matters</div>
-              <div class="story-step-copy">The strongest detail reveals itself after interest becomes mutual instead of overwhelming the first impression.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="public-section noir">
-      <div class="public-section-inner public-grid-two">
-        <div class="difference-card">
-          <div class="section-label">Compatibility, explained</div>
-          <div class="section-title">Eight signals. Human meaning first.</div>
-          <div class="section-copy" style="margin-bottom:0;">You do not need to know the traditional framework before the product becomes useful. Ashtakoota translates compatibility into shared pace, long-term harmony, emotional support, values fit, and other relationship signals that are easier to understand in real life.</div>
-        </div>
-        <div class="public-stack">
-          <div class="signal-card">
-            <div class="signal-tag">Signal example</div>
-            <div class="signal-name">Shared pace</div>
-            <div class="signal-copy">How naturally two people move through closeness, stress, and everyday emotional rhythm.</div>
-          </div>
-          <div class="signal-card">
-            <div class="signal-tag">Signal example</div>
-            <div class="signal-name">Long-term harmony</div>
-            <div class="signal-copy">Whether the connection has a steadier emotional foundation over time instead of relying on short-term chemistry alone.</div>
-          </div>
-          <div class="signal-card">
-            <div class="signal-tag">Inspired by</div>
-            <div class="signal-name">Ashtakoota tradition</div>
-            <div class="signal-copy">Culturally rooted, translated for a modern dating product, and designed to feel useful even if this is your first exposure to the framework.</div>
-          </div>
+        <div class="landing-carousel-dots" id="landing-carousel-dots" aria-label="Carousel navigation">
+          <button class="landing-carousel-dot active" type="button" aria-label="Go to slide 1" onclick="setLandingCarouselSlide(0)"></button>
+          <button class="landing-carousel-dot" type="button" aria-label="Go to slide 2" onclick="setLandingCarouselSlide(1)"></button>
+          <button class="landing-carousel-dot" type="button" aria-label="Go to slide 3" onclick="setLandingCarouselSlide(2)"></button>
+          <button class="landing-carousel-dot" type="button" aria-label="Go to slide 4" onclick="setLandingCarouselSlide(3)"></button>
         </div>
       </div>
     </section>
@@ -1345,6 +1391,9 @@ let activeChatMeta = null;
 let wsSocket = null;
 let filterTimer = null;
 let blockedUserIds = new Set();
+let landingCarouselIndex = 0;
+let landingCarouselTimer = null;
+const LANDING_CAROUSEL_TOTAL = 4;
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -1390,6 +1439,51 @@ function displayAge(user) {
 function titleizeEnum(value) {
   if (!value) return 'Not set';
   return String(value).split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+}
+
+function syncLandingCarousel() {
+  const track = document.getElementById('landing-carousel-track');
+  const dots = document.querySelectorAll('.landing-carousel-dot');
+  if (!track || !dots.length) return;
+  track.style.transform = `translateX(-${landingCarouselIndex * 100}%)`;
+  dots.forEach((dot, index) => dot.classList.toggle('active', index === landingCarouselIndex));
+}
+
+function setLandingCarouselSlide(index) {
+  landingCarouselIndex = (index + LANDING_CAROUSEL_TOTAL) % LANDING_CAROUSEL_TOTAL;
+  syncLandingCarousel();
+}
+
+function moveLandingCarousel(delta) {
+  setLandingCarouselSlide(landingCarouselIndex + delta);
+  startLandingCarouselAuto();
+}
+
+function stopLandingCarouselAuto() {
+  if (landingCarouselTimer) {
+    window.clearInterval(landingCarouselTimer);
+    landingCarouselTimer = null;
+  }
+}
+
+function startLandingCarouselAuto() {
+  stopLandingCarouselAuto();
+  const shell = document.getElementById('landing-carousel');
+  if (!shell) return;
+  landingCarouselTimer = window.setInterval(() => {
+    if (!document.hidden) setLandingCarouselSlide(landingCarouselIndex + 1);
+  }, 4200);
+}
+
+function initLandingCarousel() {
+  const shell = document.getElementById('landing-carousel');
+  if (!shell) return;
+  syncLandingCarousel();
+  shell.addEventListener('mouseenter', stopLandingCarouselAuto);
+  shell.addEventListener('mouseleave', startLandingCarouselAuto);
+  shell.addEventListener('focusin', stopLandingCarouselAuto);
+  shell.addEventListener('focusout', startLandingCarouselAuto);
+  startLandingCarouselAuto();
 }
 
 function updateVerificationBanner() {
@@ -1981,6 +2075,7 @@ async function doLogout(silent = false) {
 
 // ── Auto-login on page load ───────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
+  initLandingCarousel();
   await handleAuthActionsFromUrl();
   const initialPath = normalizePath(window.location.pathname);
   const requiresAuthCheck = initialPath === '/app' || initialPath === '/admin';
