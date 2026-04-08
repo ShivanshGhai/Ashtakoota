@@ -164,10 +164,48 @@ nav{position:sticky;top:0;z-index:100;background:rgba(18,11,13,0.88);backdrop-fi
 .landing-carousel-card .section-copy{margin-bottom:0;max-width:36ch;}
 .landing-carousel-panel{display:grid;gap:14px;padding-left:34px;}
 .landing-carousel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.landing-carousel-panel .feature-card,
+.landing-carousel-panel .teaser-card,
+.landing-carousel-panel .story-step,
+.landing-carousel-panel .signal-card{
+  background:linear-gradient(180deg, rgba(45,31,35,.96) 0%, rgba(31,22,25,.96) 100%);
+  border:1px solid rgba(213,154,133,.18);
+  border-radius:26px;
+  box-shadow:0 18px 36px rgba(0,0,0,.18);
+}
+.landing-carousel-panel .feature-card:hover,
+.landing-carousel-panel .teaser-card:hover,
+.landing-carousel-panel .story-step:hover,
+.landing-carousel-panel .signal-card:hover{
+  border-color:rgba(213,154,133,.3);
+}
+.landing-carousel-panel .feature-num,
+.landing-carousel-panel .signal-tag{
+  color:rgba(231,184,164,.72);
+}
+.landing-carousel-panel .story-step-num{
+  background:linear-gradient(180deg, rgba(185,122,102,.96), rgba(142,27,52,.96));
+  border-color:rgba(213,154,133,.28);
+}
+.landing-carousel-link{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  width:max-content;
+  margin-top:4px;
+  font-size:13px;
+  color:var(--rose-gold-soft);
+  cursor:pointer;
+  transition:color var(--ease-premium), transform var(--ease-premium);
+}
+.landing-carousel-link:hover{
+  color:var(--ink);
+  transform:translateX(2px);
+}
 .landing-carousel-dots{display:flex;gap:10px;justify-content:center;margin-top:1.9rem;}
-.landing-carousel-dot{width:10px;height:10px;border-radius:50%;border:none;padding:0;background:rgba(244,233,222,.24);cursor:pointer;transition:transform var(--ease-premium),background var(--ease-premium);}
-.landing-carousel-dot.active{background:var(--rose-gold-soft);transform:scale(1.15);}
-.landing-carousel-dot:hover{background:rgba(213,154,133,.72);}
+.landing-carousel-dot{width:11px;height:11px;border-radius:50%;border:1px solid rgba(213,154,133,.24);padding:0;background:rgba(185,122,102,.2);cursor:pointer;transition:transform var(--ease-premium),background var(--ease-premium),border-color var(--ease-premium),box-shadow var(--ease-premium);}
+.landing-carousel-dot.active{background:var(--rose-gold-soft);border-color:rgba(231,184,164,.72);box-shadow:0 0 0 4px rgba(185,122,102,.12);transform:scale(1.08);}
+.landing-carousel-dot:hover{background:rgba(213,154,133,.72);border-color:rgba(213,154,133,.48);}
 .trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
 .public-footer{border-top:1px solid rgba(213,154,133,.12);background:rgba(12,8,9,.96);padding:1.6rem 2rem 2rem;}
 .public-footer-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
@@ -743,7 +781,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
         <p class="hero-subtitle">A dating app for people who are done decoding mixed signals, roster culture, and chemistry without context.</p>
         <p class="hero-story">Ashtakoota slows the whole thing down just enough to make it real. You build an honest profile, state your intent clearly, and see whether a connection has substance before it becomes another situationship with good lighting.</p>
         <div class="hero-actions">
-          <button class="btn-lg primary" onclick="openAuth('register')">Create my profile</button>
+          <button class="btn-lg primary" onclick="openAuth('register')">Build my profile</button>
           <button class="btn-lg outline" onclick="goTo('how')">See how it works</button>
         </div>
       </div>
@@ -844,6 +882,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
                 <div class="section-label">How it works</div>
                 <div class="section-title">Simple flow. Less chaos.</div>
                 <div class="section-copy">Create a serious profile, add your birth details once, and browse people with far more context than a swipe stack gives you. When the interest is mutual, the deeper reading becomes available.</div>
+                <div class="landing-carousel-link" onclick="goTo('how')">Open the full walkthrough →</div>
               </div>
               <div class="landing-carousel-panel">
                 <div class="story-step">
@@ -908,11 +947,11 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
       <div class="cta-inner">
         <div class="cta-copy">
           <div class="section-label" style="color:var(--gold-light);">For people done with shallow matching</div>
-          <h3>Make a profile that says something real.</h3>
+          <h3>Build a profile worth taking seriously.</h3>
           <p>Join people who are over the algorithm, over the ambiguity, and over pretending chaos is romantic. Build a profile with actual intent and see whether the next connection deserves your time.</p>
         </div>
         <div class="cta-actions">
-          <button class="btn-lg primary" onclick="openAuth('register')">Start my profile</button>
+          <button class="btn-lg primary" onclick="openAuth('register')">Build my profile</button>
           <button class="btn-lg outline" onclick="goTo('how')">How it works</button>
         </div>
       </div>
@@ -950,8 +989,8 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
 
     <div class="how-hero">
       <div class="section-label">How it works</div>
-      <div class="section-title">Modern dating is loud. This is the part where it gets clear.</div>
-      <div class="section-copy">Ashtakoota is built for people who want more than chemistry, timing, and guesswork. You make a relationship-ready profile, meet people whose goals actually line up with yours, and unlock a deeper compatibility reading when the interest is mutual.</div>
+      <div class="section-title">From profile setup to mutual reading.</div>
+      <div class="section-copy">This page is the walkthrough. It shows what you enter, what the app derives from it, what you see before a match, and what only unlocks after the interest is mutual.</div>
       <div class="how-hero-grid">
         <div class="story-steps">
           <div class="story-step">
@@ -992,8 +1031,8 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
 
     <div class="features-section">
       <div class="features-inner">
-        <div class="section-label">What makes us different</div>
-        <div class="section-title">This is not another “let’s just vibe” app.</div>
+        <div class="section-label">Inside the flow</div>
+        <div class="section-title">What changes once the app has more context.</div>
         <div class="difference-list">
           <div class="difference-row">
             <div>
@@ -1265,7 +1304,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
       <div class="sidebar-profile" id="sidebar-profile"></div>
       <div class="sidebar-menu">
         <button class="sidebar-item active" data-section="dashboard" onclick="showSection('dashboard')"><span class="sidebar-icon">✦</span> Overview</button>
-        <button class="sidebar-item" data-section="insights" onclick="showSection('insights')"><span class="sidebar-icon">▣</span> Insights</button>
+        <button class="sidebar-item" id="insights-sidebar-link" data-admin-only="true" data-section="insights" style="display:none;" onclick="showSection('insights')"><span class="sidebar-icon">▣</span> Insights</button>
         <button class="sidebar-item" data-section="browse" onclick="showSection('browse')"><span class="sidebar-icon">◎</span> Discover</button>
         <button class="sidebar-item" data-section="matches" onclick="showSection('matches')"><span class="sidebar-icon">♥</span> Worth It</button>
         <button class="sidebar-item" data-section="chat" onclick="showSection('chat')"><span class="sidebar-icon">✉</span> Love Letters</button>
@@ -1295,7 +1334,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
           <div class="stat-card"><div class="stat-num" id="stat-best">—</div><div class="stat-label">Best score /36</div></div>
         </div>
         <div class="section-shortcuts">
-          <button class="section-shortcut" onclick="showSection('insights')">Open Insights</button>
+          <button class="section-shortcut" id="insights-shortcut" data-admin-only="true" style="display:none;" onclick="showSection('insights')">Open Insights</button>
           <button class="section-shortcut" onclick="showSection('requests')">Open Requests</button>
           <button class="section-shortcut" onclick="showSection('history')">Open Receipts</button>
         </div>
@@ -1458,7 +1497,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
   </div><!-- /app-layout -->
   <div class="mobile-nav">
     <button class="mobile-nav-item active" data-section="dashboard" onclick="showSection('dashboard')"><span class="mobile-nav-icon">✦</span><span>Overview</span></button>
-    <button class="mobile-nav-item" data-section="insights" onclick="showSection('insights')"><span class="mobile-nav-icon">▣</span><span>Insights</span></button>
+    <button class="mobile-nav-item" id="insights-mobile-link" data-admin-only="true" data-section="insights" style="display:none;" onclick="showSection('insights')"><span class="mobile-nav-icon">▣</span><span>Insights</span></button>
     <button class="mobile-nav-item" data-section="browse" onclick="showSection('browse')"><span class="mobile-nav-icon">◎</span><span>Discover</span></button>
     <button class="mobile-nav-item" data-section="matches" onclick="showSection('matches')"><span class="mobile-nav-icon">♥</span><span>Worth It</span></button>
     <button class="mobile-nav-item" data-section="chat" onclick="showSection('chat')"><span class="mobile-nav-icon">✉</span><span>Love Letters</span></button>
@@ -1631,6 +1670,12 @@ function updateAdminVisibility() {
   const visible = !!currentUser?.isAdmin;
   const button = document.getElementById('admin-app-link');
   if (button) button.style.display = visible ? '' : 'none';
+  document.querySelectorAll('[data-admin-only="true"]').forEach((el) => {
+    el.style.display = visible ? '' : 'none';
+  });
+  if (!visible && currentSection === 'insights') {
+    currentSection = 'dashboard';
+  }
 }
 
 function alignsWithDatingIntent(user) {
@@ -1875,6 +1920,10 @@ function goTo(pageId, opts = {}) {
 }
 
 function showSection(id) {
+  if (id === 'insights' && !currentUser?.isAdmin) {
+    toast('Admin access required');
+    id = 'dashboard';
+  }
   if (currentSection !== id) previousSection = currentSection;
   currentSection = id;
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));

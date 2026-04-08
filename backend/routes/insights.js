@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const db = require('../config/db');
 const auth = require('../middleware/auth');
+const requireAdmin = require('../middleware/admin');
 const { getCompatibilityRuleStatus } = require('../utils/compatRules');
 
 const JOIN_QUERY_SQL = `
@@ -122,7 +123,7 @@ FROM USER u
 WHERE u.UserID = ?
 `;
 
-router.get('/overview', auth, async (req, res) => {
+router.get('/overview', auth, requireAdmin, async (req, res) => {
   try {
     const ruleStatus = getCompatibilityRuleStatus();
     const [[aggregateRow]] = await db.query(AGGREGATION_QUERY_SQL);
@@ -154,7 +155,7 @@ router.get('/overview', auth, async (req, res) => {
   }
 });
 
-router.get('/query-lab', auth, async (req, res) => {
+router.get('/query-lab', auth, requireAdmin, async (req, res) => {
   try {
     const [
       [joinRows],
