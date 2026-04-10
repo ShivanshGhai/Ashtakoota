@@ -88,6 +88,7 @@ railway variables set DB_NAME=railway
 railway variables set JWT_SECRET=<generate_64_char_random_string>
 railway variables set JWT_EXPIRES_IN=7d
 railway variables set PORT=4000
+railway variables set ADMIN_EMAILS=arjun_demo@example.com
 
 # Optional: Prokerala API (sign up free at https://api.prokerala.com)
 railway variables set PROKERALA_CLIENT_ID=<your_id>
@@ -111,6 +112,8 @@ railway up
 
 Note your backend URL: `https://your-backend.up.railway.app`
 
+`ADMIN_EMAILS` is the preferred grading configuration for `Insights`. If it is not set, the backend falls back to `arjun_demo@example.com` as the demo admin so the seeded Part 3 walkthrough is still reproducible.
+
 ---
 
 ## Step 3: Initialise the Database
@@ -133,6 +136,14 @@ mysql -u <user> -p <database> < submission_setup.sql
 ```
 
 That script loads the schema plus demo users, matches, readings, messages, and notifications so the query lab has non-empty results.
+
+The seeded demo login is:
+```text
+Email: arjun_demo@example.com
+Password: Part3Demo!
+```
+
+That account is the canonical Part 3 demo admin used for the `Insights` walkthrough.
 
 ---
 
@@ -262,3 +273,16 @@ WS     /chat (Socket.io namespace)
   emit: send_message { matchId, body }
   on:   new_message { ...msg, senderUsername }
 ```
+
+---
+
+## Part 3 Demo Notes
+
+- Use `arjun_demo@example.com` / `Part3Demo!` for the rubric-driven walkthrough.
+- `Insights` is intended to show the required join, division, aggregation, grouped aggregation, delete-with-cascade, and update demonstrations.
+- The delete demo removes a `MATCH_RECORD`, which cascades to `INVOLVES` and `MESSAGES`. Compatibility history stays in `COMPATIBILITY_EVAL` and `KOOTA_SCORE`.
+- Trigger-backed integrity rules live in `backend/config/schema.sql`; a simple demo is `INSERT INTO LIKES (UserA, UserB) VALUES (1, 1);`, which should fail.
+
+## Part 3 Submission Packaging
+
+Use [part3-submission-checklist.md](/Users/shivanshghai/Library/Mobile Documents/com~apple~CloudDocs/CMPT 354/Project/ashtakoota/docs/part3-submission-checklist.md) before creating the final zip. Do not include `.git`, `node_modules`, `.env`, `.DS_Store`, or the temporary screenshot files under `frontend/`.

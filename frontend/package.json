@@ -5,6 +5,7 @@
   "description": "Railway frontend server for the Ashtakoota SPA",
   "main": "server.js",
   "scripts": {
+    "test": "npm run test:smoke",
     "start": "node server.js",
     "test:smoke": "node tests/smoke.test.js"
   },

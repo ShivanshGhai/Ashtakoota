@@ -1,13 +1,5 @@
 const db = require('../config/db');
-
-function adminEmails() {
-  return new Set(
-    String(process.env.ADMIN_EMAILS || '')
-      .split(',')
-      .map(email => email.trim().toLowerCase())
-      .filter(Boolean)
-  );
-}
+const { isAdminEmail } = require('../utils/adminAccess');
 
 module.exports = async function requireAdmin(req, res, next) {
   try {
@@ -16,7 +8,7 @@ module.exports = async function requireAdmin(req, res, next) {
       [req.user.userId]
     );
     if (!user) return res.status(404).json({ error: 'User not found' });
-    if (!adminEmails().has(String(user.Email || '').toLowerCase())) {
+    if (!isAdminEmail(user.Email)) {
       return res.status(403).json({ error: 'Admin access required' });
     }
     req.isAdmin = true;

@@ -16,11 +16,14 @@ Target repo: `sadhikahuria/CMPT_354_final_project`
    - `JWT_EXPIRES_IN`
    - `PORT`
    - `FRONTEND_URL`
+   - `ADMIN_EMAILS=arjun_demo@example.com`
    - Optional mail and Prokerala variables if you want those features active in the demo.
 4. Run [submission_setup.sql](/Users/shivanshghai/Library/Mobile Documents/com~apple~CloudDocs/CMPT 354/Project/ashtakoota/backend/config/submission_setup.sql) against the Railway MySQL instance from the `backend/config` directory.
 5. Point the frontend deployment at the frontend directory from the final repo.
 6. Verify:
    - login works for a seeded demo account
+   - `arjun_demo@example.com` / `Part3Demo!` can access `Insights`
    - `Insights` loads successfully
    - at least one query card in the lab returns seeded rows
    - match deletion and notification/profile updates are reflected after refresh
+   - `INSERT INTO LIKES (UserA, UserB) VALUES (1, 1);` fails because of the self-like trigger

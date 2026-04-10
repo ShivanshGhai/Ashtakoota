@@ -71,6 +71,8 @@ GROUP BY GanaPair
 ORDER BY AverageScore DESC, ReadingCount DESC, GanaPair ASC;
 
 -- 5. Delete-with-cascade demo target lookup
+-- Deleting MATCH_RECORD demonstrates FK cascade into INVOLVES and MESSAGES.
+-- COMPATIBILITY_EVAL / KOOTA_SCORE remain as historical readings in the current design.
 -- Bind current user id twice.
 SELECT mr.MatchID,
        ce.EvalID,

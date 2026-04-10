@@ -7,6 +7,7 @@ const db      = require('../config/db');
 const requireAuth = require('../middleware/auth');
 const { extractToken } = require('../middleware/auth');
 const { getBirthChart } = require('../utils/astrology');
+const { isAdminEmail } = require('../utils/adminAccess');
 const mailer  = require('../utils/mailer');
 const multer  = require('multer');
 const path    = require('path');
@@ -500,12 +501,6 @@ router.get('/me', requireAuth, async (req, res) => {
 function sanitizeUser(u, options = {}) {
   const includePrivate = options.includePrivate !== false;
   const age = ageFromDate(u.DateOfBirth);
-  const adminEmails = new Set(
-    String(process.env.ADMIN_EMAILS || '')
-      .split(',')
-      .map(email => email.trim().toLowerCase())
-      .filter(Boolean)
-  );
   const base = {
     id:            u.UserID,
     username:      u.Username,
@@ -526,7 +521,7 @@ function sanitizeUser(u, options = {}) {
     lookingFor: u.LookingFor,
     relationshipIntent: u.RelationshipIntent,
     emailVerified: !!u.EmailVerifiedAt,
-    isAdmin: adminEmails.has(String(u.Email || '').toLowerCase()),
+    isAdmin: isAdminEmail(u.Email),
     createdAt:     u.CreatedAt,
     age,
     cityRegion:    cityRegion(u.BirthLocation),

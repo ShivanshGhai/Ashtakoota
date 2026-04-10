@@ -23,7 +23,7 @@ Ashtakoota is a dating app for users who want compatibility screening built arou
    - The app is not just a UI shell over a database assignment; the relational model now meaningfully drives app behavior and analysis.
 
 ## Demo users
-- `arjun_demo@example.com`
+- `arjun_demo@example.com` (canonical Part 3 demo admin / Insights login)
 - `maya_demo@example.com`
 - `neel_demo@example.com`
 - `tara_demo@example.com`
