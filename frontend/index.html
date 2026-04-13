@@ -528,7 +528,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
 .request-actions{display:flex;gap:8px;}
 
 /* ── NOTIFICATIONS PANEL ── */
-.notif-panel{position:absolute;top:58px;right:1rem;width:340px;background:var(--surface);border:.5px solid var(--border-strong);border-radius:12px;box-shadow:var(--shadow);z-index:300;display:none;max-height:400px;overflow-y:auto;}
+.notif-panel{position:fixed;top:58px;right:1rem;width:340px;background:var(--surface);border:.5px solid var(--border-strong);border-radius:12px;box-shadow:var(--shadow);z-index:300;display:none;max-height:400px;overflow-y:auto;}
 .notif-panel.open{display:block;}
 .notif-panel-header{padding:12px 16px;border-bottom:.5px solid var(--border);font-size:13px;font-weight:500;display:flex;justify-content:space-between;align-items:center;}
 .notif-item{padding:12px 16px;border-bottom:.5px solid var(--border);font-size:13px;cursor:pointer;transition:background .15s;}
@@ -2458,7 +2458,7 @@ function renderQueryCard(query) {
       ${notes ? `<div class="query-card-notes">${notes}</div>` : ''}
       <div class="query-card-actions">
         ${query.title === 'Delete With Cascade Demo' && query.target?.EvalID && query.target?.MatchID ? `<button class="btn-primary" onclick="openCompat(${query.target.EvalID}, ${query.target.MatchID})">Open demo match</button>` : ''}
-        ${query.title === 'Update Operation Demo' ? `<button class="btn-ghost" onclick="toggleNotifPanel()">Open notifications</button><button class="btn-ghost" onclick="showSection('my-profile')">Open profile editor</button>` : ''}
+        ${query.title === 'Update Operation Demo' ? `<button class="btn-ghost" onclick="openNotifPanel()">Open notifications</button><button class="btn-ghost" onclick="showSection('my-profile')">Open profile editor</button>` : ''}
       </div>
     </div>`;
 }
@@ -3418,6 +3418,12 @@ function toggleNotifPanel() {
   if (panel.classList.contains('open')) loadNotifications();
 }
 
+function openNotifPanel() {
+  const panel = document.getElementById('notif-panel');
+  if (!panel.classList.contains('open')) panel.classList.add('open');
+  loadNotifications();
+}
+
 async function markAllRead() {
   await api('PATCH', '/api/notifications/read-all');
   loadNotifications();
@@ -3484,7 +3490,12 @@ function connectWebSocket() {
 // ── Close notif panel on outside click ───────────────
 document.addEventListener('click', (e) => {
   const panel = document.getElementById('notif-panel');
-  if (panel.classList.contains('open') && !panel.contains(e.target) && !e.target.closest('[onclick="toggleNotifPanel()"]')) {
+  if (
+    panel.classList.contains('open') &&
+    !panel.contains(e.target) &&
+    !e.target.closest('[onclick="toggleNotifPanel()"]') &&
+    !e.target.closest('[onclick="openNotifPanel()"]')
+  ) {
     panel.classList.remove('open');
   }
 });
