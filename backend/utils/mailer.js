@@ -4,6 +4,8 @@ const nodemailer = require('nodemailer');
 const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10);
 const smtpSecure = String(process.env.SMTP_SECURE || '').toLowerCase() === 'true'
   || smtpPort === 465;
+const resendApiKey = process.env.RESEND_API_KEY;
+const resendFrom = process.env.RESEND_FROM || process.env.EMAIL_FROM || 'Ashtakoota <onboarding@resend.dev>';
 
 const transporter = (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS)
   ? nodemailer.createTransport({
@@ -30,8 +32,8 @@ function requireTransport() {
       .filter(key => !process.env[key]);
     throw new Error(
       missing.length
-        ? `SMTP not configured: missing ${missing.join(', ')}. For Gmail, set SMTP_HOST=smtp.gmail.com, SMTP_PORT=587, SMTP_SECURE=false, SMTP_USER, SMTP_PASS as an app password, and EMAIL_FROM.`
-        : 'SMTP transport unavailable'
+        ? `Email delivery is not configured: missing RESEND_API_KEY or SMTP fallback variables (${missing.join(', ')}). On Railway Hobby, use RESEND_API_KEY because outbound SMTP is blocked.`
+        : 'SMTP transport unavailable. On Railway Hobby, use RESEND_API_KEY because outbound SMTP is blocked.'
     );
   }
   if (!process.env.EMAIL_FROM) {
@@ -44,10 +46,48 @@ function mailConfigStatus() {
   const missing = ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS', 'EMAIL_FROM']
     .filter(key => !process.env[key]);
   return {
-    configured: missing.length === 0 && !!transporter,
-    missing,
-    providerHint: 'For Gmail, use smtp.gmail.com:587 with SMTP_SECURE=false and a Google app password.',
+    configured: !!resendApiKey || (missing.length === 0 && !!transporter),
+    provider: resendApiKey ? 'resend' : 'smtp',
+    missing: resendApiKey ? [] : missing,
+    providerHint: 'Railway Hobby blocks SMTP. Use RESEND_API_KEY with RESEND_FROM, or upgrade Railway to Pro for SMTP.',
   };
+}
+
+async function sendViaResend({ to, subject, html }) {
+  if (!resendApiKey) {
+    throw new Error('RESEND_API_KEY is not configured');
+  }
+
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${resendApiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: resendFrom,
+      to: [to],
+      subject,
+      html,
+    }),
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    const message = data?.message || data?.error || response.statusText;
+    throw new Error(`Resend email failed (${response.status}): ${message}`);
+  }
+}
+
+async function sendMail(message) {
+  if (resendApiKey) {
+    return sendViaResend(message);
+  }
+
+  return requireTransport().sendMail({
+    from: process.env.EMAIL_FROM,
+    ...message,
+  });
 }
 
 const GOLD = '#C9A84C';
@@ -70,8 +110,7 @@ function baseTemplate(title, bodyHtml) {
 }
 
 async function sendLikeNotification(toEmail, toName, fromName) {
-  await requireTransport().sendMail({
-    from: process.env.EMAIL_FROM,
+  await sendMail({
     to: toEmail,
     subject: `${fromName} liked your profile ✦`,
     html: baseTemplate('Someone likes you', `
@@ -87,8 +126,7 @@ async function sendLikeNotification(toEmail, toName, fromName) {
 }
 
 async function sendMatchNotification(toEmail, toName, matchName, score) {
-  await requireTransport().sendMail({
-    from: process.env.EMAIL_FROM,
+  await sendMail({
     to: toEmail,
     subject: `It's a match! You & ${matchName} scored ${score}/36 ✦`,
     html: baseTemplate("It's a match! ✦", `
@@ -108,8 +146,7 @@ async function sendMatchNotification(toEmail, toName, matchName, score) {
 }
 
 async function sendCompatRequestNotification(toEmail, toName, fromName) {
-  await requireTransport().sendMail({
-    from: process.env.EMAIL_FROM,
+  await sendMail({
     to: toEmail,
     subject: `${fromName} wants to check your compatibility ✦`,
     html: baseTemplate('Compatibility Request', `
@@ -126,8 +163,7 @@ async function sendCompatRequestNotification(toEmail, toName, fromName) {
 }
 
 async function sendVerificationEmail(toEmail, toName, verifyUrl) {
-  await requireTransport().sendMail({
-    from: process.env.EMAIL_FROM,
+  await sendMail({
     to: toEmail,
     subject: 'Verify your Ashtakoota account',
     html: baseTemplate('Verify your email', `
@@ -142,8 +178,7 @@ async function sendVerificationEmail(toEmail, toName, verifyUrl) {
 }
 
 async function sendPasswordResetEmail(toEmail, toName, resetUrl) {
-  await requireTransport().sendMail({
-    from: process.env.EMAIL_FROM,
+  await sendMail({
     to: toEmail,
     subject: 'Reset your Ashtakoota password',
     html: baseTemplate('Reset your password', `

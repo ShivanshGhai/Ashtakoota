@@ -23,13 +23,10 @@ Target repo: `sadhikahuria/CMPT_354_final_project`
    - Backend variable: `UPLOAD_DIR=./uploads`
    - This preserves existing `/uploads/...` URLs across redeploys.
    - Photos already lost from previous ephemeral deployments must be reuploaded unless you have a backup.
-5. Configure Gmail verification mail:
-   - `SMTP_HOST=smtp.gmail.com`
-   - `SMTP_PORT=587`
-   - `SMTP_SECURE=false`
-   - `SMTP_USER=<ashtakoota Gmail address>`
-   - `SMTP_PASS=<Google app password, not the normal Gmail password>`
-   - `EMAIL_FROM="Ashtakoota <same Gmail address>"`
+5. Configure verification mail:
+   - Railway Hobby blocks outbound SMTP, so use Resend's HTTPS API.
+   - `RESEND_API_KEY=<fresh Resend API key>`
+   - `RESEND_FROM="Ashtakoota <onboarding@resend.dev>"` for initial testing, or a verified sending domain later.
    - `FRONTEND_URL=<live frontend URL>`
 6. Run [submission_setup.sql](/Users/shivanshghai/Library/Mobile Documents/com~apple~CloudDocs/CMPT 354/Project/ashtakoota/backend/config/submission_setup.sql) against the Railway MySQL instance from the `backend/config` directory if the database is new or empty.
 7. Point the frontend deployment at the frontend directory from the final repo.
