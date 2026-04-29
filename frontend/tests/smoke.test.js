@@ -25,5 +25,7 @@ assert(ids.has('sec-insights'), 'insights section should exist');
 assert(scriptMatch[1].includes("api('GET', '/api/insights/overview')"), 'insights should load the overview endpoint');
 assert(scriptMatch[1].includes("api('GET', '/api/insights/query-lab')"), 'insights should load the query-lab endpoint');
 assert(html.includes('data-section="insights"'), 'insights navigation entry should exist');
+assert(scriptMatch[1].includes('function normalizedInsight'), 'frontend should render backend personalized insights');
+assert(scriptMatch[1].includes('personalizedInsight'), 'frontend should consume personalizedInsight payloads');
 
 console.log('frontend smoke test passed');

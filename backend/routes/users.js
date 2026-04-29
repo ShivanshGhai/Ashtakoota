@@ -6,6 +6,7 @@ const { sanitizeUser, getUserPhotos } = require('./auth');
 const { visibleUserFilterSql, isBlockedEitherWay } = require('../utils/safety');
 const { normalizeAvatar, normalizePlainText, stripHtml } = require('../utils/security');
 const { calculateAshtakoota } = require('../utils/koota');
+const { buildPersonalizedInsight } = require('../utils/personalizedInsight');
 const allowedIntents = new Set(['marriage', 'long-term', 'serious-dating', 'exploring']);
 const allowedLookingFor = new Set(['man', 'woman', 'everyone']);
 const RECOMMENDED_MIN_SCORE = 25;
@@ -60,10 +61,14 @@ function computeCompat(currentUser, otherUser) {
       explanation: item.explanation,
     }));
 
-  return {
+  const compat = {
     totalScore,
     label: matchQualityLabel,
     reasons: topReasons,
+  };
+  return {
+    ...compat,
+    personalizedInsight: buildPersonalizedInsight(currentUser, otherUser, compat),
   };
 }
 
@@ -148,6 +153,7 @@ router.get('/best-matches', auth, async (req, res) => {
         totalScore: compat.totalScore,
         label: compat.label,
         reasons: compat.reasons,
+        personalizedInsight: compat.personalizedInsight,
       });
     }
 
@@ -195,6 +201,7 @@ router.get('/:id', auth, async (req, res) => {
         label:      compat.label,
         evaluatedAt: evalRow?.EvaluatedAtTimestamp || null,
         reasons:    compat.reasons,
+        personalizedInsight: compat.personalizedInsight,
       },
       liked: !!likeRow,
     });

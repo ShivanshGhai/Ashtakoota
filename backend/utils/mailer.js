@@ -30,14 +30,24 @@ function requireTransport() {
       .filter(key => !process.env[key]);
     throw new Error(
       missing.length
-        ? `SMTP not configured: missing ${missing.join(', ')}`
+        ? `SMTP not configured: missing ${missing.join(', ')}. For Gmail, set SMTP_HOST=smtp.gmail.com, SMTP_PORT=587, SMTP_SECURE=false, SMTP_USER, SMTP_PASS as an app password, and EMAIL_FROM.`
         : 'SMTP transport unavailable'
     );
   }
   if (!process.env.EMAIL_FROM) {
-    throw new Error('SMTP not configured: missing EMAIL_FROM');
+    throw new Error('SMTP not configured: missing EMAIL_FROM. Set this to the sender identity users should see.');
   }
   return transporter;
+}
+
+function mailConfigStatus() {
+  const missing = ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS', 'EMAIL_FROM']
+    .filter(key => !process.env[key]);
+  return {
+    configured: missing.length === 0 && !!transporter,
+    missing,
+    providerHint: 'For Gmail, use smtp.gmail.com:587 with SMTP_SECURE=false and a Google app password.',
+  };
 }
 
 const GOLD = '#C9A84C';
@@ -148,6 +158,7 @@ async function sendPasswordResetEmail(toEmail, toName, resetUrl) {
 }
 
 module.exports = {
+  mailConfigStatus,
   sendLikeNotification,
   sendMatchNotification,
   sendCompatRequestNotification,

@@ -1799,6 +1799,31 @@ function simplifyReason(reason) {
   };
 }
 
+function normalizedInsight(evalOrMatch) {
+  const insight = evalOrMatch?.personalizedInsight || evalOrMatch?.compatEval?.personalizedInsight || null;
+  if (!insight) return null;
+  const highlights = Array.isArray(insight.highlights) ? insight.highlights.filter(Boolean) : [];
+  return {
+    headline: insight.headline || 'Why this could work',
+    summary: insight.summary || '',
+    highlights,
+    conversationStarter: insight.conversationStarter || '',
+  };
+}
+
+function renderInsightHighlights(insight, limit = 2) {
+  const safeInsight = normalizedInsight({ personalizedInsight: insight });
+  if (!safeInsight) return '';
+  const highlights = safeInsight.highlights.slice(0, limit);
+  if (!highlights.length) return safeInsight.summary
+    ? `<div class="profile-reason">${escapeHtml(safeInsight.summary)}</div>`
+    : '';
+  return highlights.map(item => `
+    <div class="profile-reason">
+      <strong>${escapeHtml(item.label || 'Why this could work')}</strong>: ${escapeHtml(item.text || safeInsight.summary || 'There is a meaningful signal here.')}
+    </div>`).join('');
+}
+
 function getOrderedPhotos(user) {
   if (Array.isArray(user?.photos) && user.photos.length) return user.photos;
   if (user?.avatarURL) return [{ url: user.avatarURL, isPrimary: true, sortOrder: 0 }];
@@ -2203,9 +2228,9 @@ async function doRegister() {
       if (verificationEmailSent) {
         toast(`Profile created. Verify ${verificationEmail} to unlock likes, chat, and requests.`, 6000);
       } else if (verificationUrl) {
-        openVerificationFallback(verificationUrl, 'Profile created. Email delivery is unavailable, so your verification link will open directly.');
+        openVerificationFallback(verificationUrl, data.verificationEmailMessage || 'Profile created. Email delivery is unavailable, so your verification link will open directly.');
       } else {
-        toast(`Profile created, but the verification email could not be sent. Use Resend verification after login once mail is fixed.`, 6000);
+        toast(data.verificationEmailMessage || `Profile created, but the verification email could not be sent. Use Resend verification after login once mail is fixed.`, 6000);
       }
     }, 1200);
   } catch (e) {
@@ -2568,7 +2593,7 @@ async function loadDashboard() {
           <div class="bm-info">
             <div class="bm-name">${escapeHtml(m.user.username)}</div>
             <div class="bm-sign">${escapeHtml(m.user.rashi)} · ${escapeHtml(m.user.nakshatra)}</div>
-            ${m.reasons?.[0] ? `<div class="bm-sign" style="margin-top:3px;">${escapeHtml(simplifyReason(m.reasons[0]).title)}: ${escapeHtml(simplifyReason(m.reasons[0]).text)}</div>` : ''}
+            ${normalizedInsight(m)?.summary ? `<div class="bm-sign" style="margin-top:3px;">${escapeHtml(normalizedInsight(m).summary)}</div>` : ''}
           </div>
           <div class="bm-score">${escapeHtml(m.totalScore)}</div>
         </div>`).join('')
@@ -2635,6 +2660,7 @@ function profileCard(u) {
   const blocked = blockedUserIds.has(u.id);
   const reasons = eval_?.reasons || [];
   const simpleReasons = reasons.map(simplifyReason);
+  const insight = normalizedInsight(eval_);
   const avatarContent = u.avatarURL
     ? `<img src="${API}${encodeURI(u.avatarURL)}" alt="${escapeAttr(u.username)}" style="width:100%;height:100%;object-fit:cover;" />`
     : escapeHtml(u.username[0].toUpperCase());
@@ -2651,12 +2677,15 @@ function profileCard(u) {
           ${eval_ ? `<span class="compat-badge ${label}">${escapeHtml(verdict)}</span>` : '<span style="font-size:12px;color:var(--ink-soft);">No reading yet</span>'}
           <div><span class="score-num">${escapeHtml(score)}</span><span class="score-denom">${eval_ ? '/36' : ''}</span></div>
         </div>
-        ${simpleReasons.length ? `<div class="profile-reasons">${simpleReasons.slice(0, 2).map(reason => `<div class="profile-reason"><strong>${escapeHtml(reason.title)}</strong>: ${escapeHtml(reason.text)}</div>`).join('')}</div>` : ''}
+        ${insight ? `<div class="profile-reasons">
+          <div class="profile-reason"><strong>${escapeHtml(insight.headline)}</strong>: ${escapeHtml(insight.summary)}</div>
+          ${renderInsightHighlights(insight, 1)}
+        </div>` : simpleReasons.length ? `<div class="profile-reasons">${simpleReasons.slice(0, 2).map(reason => `<div class="profile-reason"><strong>${escapeHtml(reason.title)}</strong>: ${escapeHtml(reason.text)}</div>`).join('')}</div>` : ''}
         <div class="profile-actions">
           <button class="like-btn ${liked?'liked':''}" id="likebtn-${u.id}" onclick="toggleLike(${u.id})" ${blocked ? 'disabled' : ''}>
             ${blocked ? 'Blocked' : liked ? '♥ Liked' : '♡ Like'}
           </button>
-          <button class="req-btn ${blocked ? 'sent' : ''}" id="reqbtn-${u.id}" onclick="sendCompatRequest(${u.id})" ${blocked ? 'disabled' : ''}>${blocked ? 'Unavailable' : '✧ Reading'}</button>
+          <button class="req-btn ${blocked ? 'sent' : ''}" id="reqbtn-${u.id}" onclick="sendCompatRequest(${u.id})" ${blocked ? 'disabled' : ''}>${blocked ? 'Unavailable' : 'Deeper read'}</button>
         </div>
       </div>
     </div>`;
@@ -2802,6 +2831,7 @@ async function openProfile(userId) {
     const data = await api('GET', `/api/users/${userId}`);
     const u = data.user;
     const eval_ = data.compatEval;
+    const insight = normalizedInsight(eval_);
     const liked  = data.liked;
     const blocked = blockedUserIds.has(userId);
     const avatarContent = u.avatarURL
@@ -2817,12 +2847,8 @@ async function openProfile(userId) {
         <div class="astro-tags" style="margin-top:10px;">
           <span class="astro-tag">${escapeHtml(titleizeEnum(u.relationshipIntent))}</span>
           <span class="astro-tag">Looking for ${escapeHtml(titleizeEnum(u.lookingFor))}</span>
-          <span class="astro-tag">${escapeHtml(u.rashi)}</span>
-          <span class="astro-tag">${escapeHtml(u.nakshatra)} Nakshatra</span>
-          <span class="astro-tag">${escapeHtml(u.gana)} Gana</span>
-          <span class="astro-tag">${escapeHtml(u.nadi)} Nadi</span>
-          <span class="astro-tag">${escapeHtml(u.yoni)} Yoni</span>
-          <span class="astro-tag">${escapeHtml(u.varna)}</span>
+          <span class="astro-tag">${escapeHtml(u.rashi)} moon</span>
+          <span class="astro-tag">${escapeHtml(u.nakshatra)} pattern</span>
         </div>
         ${renderPhotoGallery(u, 'Profile photos')}
       </div>`;
@@ -2833,14 +2859,10 @@ async function openProfile(userId) {
       ['Relationship intent', titleizeEnum(u.relationshipIntent)],
       ['Looking for', titleizeEnum(u.lookingFor)],
       ['Gender identity', titleizeEnum(u.genderIdentity)],
-      ['Rashi (Moon sign)', u.rashi],
-      ['Nakshatra', u.nakshatra],
-      ['Ruling planet', u.rashiRuler],
-      ['Gana', u.gana],
-      ['Nadi', u.nadi],
-      ['Yoni', u.yoni],
-      ['Varna', u.varna],
-      ['Vashya group', u.vashyaGroup],
+      ['Moon sign', u.rashi],
+      ['Compatibility pattern', u.nakshatra],
+      ['Relationship rhythm', u.gana],
+      ['Shared pace signal', u.nadi],
     ].map(([l, v]) => `<div class="detail-field"><div class="detail-field-label">${escapeHtml(l)}</div><div class="detail-field-value">${escapeHtml(v || '—')}</div></div>`).join('');
 
     document.getElementById('profile-detail-compat').innerHTML = eval_
@@ -2849,8 +2871,12 @@ async function openProfile(userId) {
            <div class="score-small">/ 36</div>
          </div>
          <span class="compat-badge ${eval_.label.toLowerCase()}" style="font-size:14px;padding:6px 16px;">${escapeHtml(matchTierLabel(eval_.label))}</span>
-         ${eval_.reasons?.length ? `<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;text-align:left;">${eval_.reasons.map(simplifyReason).map(reason => `<div class="profile-reason"><strong>${escapeHtml(reason.title)}</strong>: ${escapeHtml(reason.text)}</div>`).join('')}</div>` : ''}
-         ${eval_.evalId ? `<div style="font-size:12px;color:var(--ink-soft);margin-top:10px;cursor:pointer;" onclick="openCompat(${eval_.evalId})">View full breakdown →</div>` : '<div style="font-size:12px;color:var(--ink-soft);margin-top:10px;">Full breakdown unlocks once a reading is created.</div>'}`
+         ${insight ? `<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;text-align:left;">
+            <div class="profile-reason"><strong>${escapeHtml(insight.headline)}</strong>: ${escapeHtml(insight.summary)}</div>
+            ${renderInsightHighlights(insight, 3)}
+            ${insight.conversationStarter ? `<div class="profile-reason"><strong>Conversation starter</strong>: ${escapeHtml(insight.conversationStarter)}</div>` : ''}
+          </div>` : eval_.reasons?.length ? `<div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;text-align:left;">${eval_.reasons.map(simplifyReason).map(reason => `<div class="profile-reason"><strong>${escapeHtml(reason.title)}</strong>: ${escapeHtml(reason.text)}</div>`).join('')}</div>` : ''}
+         ${eval_.evalId ? `<div style="font-size:12px;color:var(--ink-soft);margin-top:10px;cursor:pointer;" onclick="openCompat(${eval_.evalId})">Open deeper reading →</div>` : '<div style="font-size:12px;color:var(--ink-soft);margin-top:10px;">A deeper reading unlocks once both people show interest.</div>'}`
       : `<div style="font-size:13px;color:var(--ink-soft);padding:1rem 0;">No reading yet.<br>Request one to see compatibility.</div>`;
 
     const likeBtn = document.getElementById('profile-like-btn');
@@ -2859,7 +2885,7 @@ async function openProfile(userId) {
     likeBtn.disabled = blocked;
     document.getElementById('profile-req-btn').setAttribute('data-uid', userId);
     document.getElementById('profile-req-btn').disabled = blocked;
-    document.getElementById('profile-req-btn').textContent = blocked ? 'Unavailable' : '✧ Request Reading';
+    document.getElementById('profile-req-btn').textContent = blocked ? 'Unavailable' : 'Request deeper read';
     document.getElementById('profile-block-btn').textContent = blocked ? 'Unblock' : 'Block';
   } catch (e) {
     toast('Failed to load profile: ' + e.message);

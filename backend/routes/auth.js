@@ -324,7 +324,7 @@ router.post('/register', rateLimit({
 
     const verification = await issueVerificationForUser(user.UserID, user.Email, user.Username);
     if (!verification.sent && verification.error) {
-      console.warn('verification email failed:', verification.error.message);
+      console.warn('verification email failed:', verification.error.message, mailer.mailConfigStatus());
     }
 
     const token = makeToken(user);
@@ -335,6 +335,9 @@ router.post('/register', rateLimit({
       chart: { ...chart, rashiName: user.RashiName, nakshatraName: user.NakshatraName },
       verificationEmailSent: verification.sent,
       verificationUrl: verification.sent ? null : verification.verificationUrl,
+      verificationEmailMessage: verification.sent
+        ? 'Verification email sent'
+        : verification.error?.message || 'Verification email is unavailable',
     });
   } catch (err) {
     cleanupUploadedFiles(req.files);
