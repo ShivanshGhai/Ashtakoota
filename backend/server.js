@@ -179,16 +179,20 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
 });
 
+async function initializeDatabase() {
+  await db.verifyConnection();
+  await ensureSafetyTables();
+  await ensureUserColumns();
+  await ensureUserPhotoTable();
+  await warmCompatibilityRules();
+}
+
 // ── Start ─────────────────────────────────────────────────────────────────
 const PORT = parseInt(process.env.PORT || '4000');
-Promise.all([ensureSafetyTables(), ensureUserColumns(), ensureUserPhotoTable()])
-  .catch(err => {
-    console.error('Failed to ensure safety tables:', err.message);
-    process.exit(1);
-  })
-  .then(() => warmCompatibilityRules())
-  .then(() => {
-    server.listen(PORT, '0.0.0.0', () => {
-      console.log(`✦ Ashtakoota server running on port ${PORT}`);
-    });
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Ashtakoota server running on port ${PORT}`);
+
+  initializeDatabase().catch(err => {
+    console.error('Database initialization failed:', err.message);
   });
+});
