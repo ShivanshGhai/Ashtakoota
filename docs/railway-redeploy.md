@@ -17,7 +17,9 @@ Target repo: `sadhikahuria/CMPT_354_final_project`
    - `PORT`
    - `FRONTEND_URL`
    - `ADMIN_EMAILS=arjun_demo@example.com`
-   - Optional mail and Prokerala variables if you want those features active in the demo.
+   - `RESEND_API_KEY`
+   - `RESEND_FROM="Ashtakoota <onboarding@resend.dev>"`
+   - Optional Prokerala variables if you want those features active in the demo.
 4. Attach a Railway volume to the backend service for uploaded photos:
    - Mount path: `/app/uploads`
    - Backend variable: `UPLOAD_DIR=./uploads`
@@ -30,7 +32,15 @@ Target repo: `sadhikahuria/CMPT_354_final_project`
    - `FRONTEND_URL=<live frontend URL>`
 6. Run [submission_setup.sql](/Users/shivanshghai/Library/Mobile Documents/com~apple~CloudDocs/CMPT 354/Project/ashtakoota/backend/config/submission_setup.sql) against the Railway MySQL instance from the `backend/config` directory if the database is new or empty.
 7. Point the frontend deployment at the frontend directory from the final repo.
-8. Verify:
+8. Set the frontend service variable:
+   - `FRONTEND_API_URL=<live backend URL>`
+9. Run the beta deployment verifier from the repo root:
+   ```bash
+   node scripts/verify-beta-deployment.js \
+     --frontend <live frontend URL> \
+     --backend <live backend URL>
+   ```
+10. Verify:
    - login works for a seeded demo account
    - `arjun_demo@example.com` / `Part3Demo!` can access `Insights`
    - `Insights` loads successfully
@@ -39,3 +49,4 @@ Target repo: `sadhikahuria/CMPT_354_final_project`
    - `INSERT INTO LIKES (UserA, UserB) VALUES (1, 1);` fails because of the self-like trigger
    - a newly uploaded profile photo still loads after a backend redeploy
    - a real email account receives the verification link and `/api/auth/verify-email` marks the user verified
+   - the full [beta QA checklist](./beta-qa-checklist.md) passes before inviting testers

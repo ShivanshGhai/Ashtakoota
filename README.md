@@ -46,7 +46,7 @@ ashtakoota/
 | Best matches | Top 3 by total Guna score |
 | PDF certificate | Guna Milan cert via PDFKit |
 | Real-time chat | Socket.io WebSocket + REST fallback |
-| Notifications | In-app feed + email via Nodemailer |
+| Notifications | In-app feed + email via Resend or Nodemailer |
 | Avatars | Multer file upload, served statically |
 | Insights | Live query lab for join, division, aggregation, group-by, delete, update demos |
 
@@ -94,12 +94,13 @@ railway variables set ADMIN_EMAILS=arjun_demo@example.com
 railway variables set PROKERALA_CLIENT_ID=<your_id>
 railway variables set PROKERALA_CLIENT_SECRET=<your_secret>
 
-# Optional: Gmail email notifications
-railway variables set SMTP_HOST=smtp.gmail.com
-railway variables set SMTP_PORT=587
-railway variables set SMTP_USER=<your_gmail>
-railway variables set SMTP_PASS=<gmail_app_password>
-railway variables set EMAIL_FROM="Ashtakoota <your_gmail>"
+# Email verification and notifications
+# Railway Hobby blocks SMTP, so use Resend's HTTPS API in production.
+railway variables set RESEND_API_KEY=<your_resend_api_key>
+railway variables set RESEND_FROM="Ashtakoota <onboarding@resend.dev>"
+
+# Persistent uploaded photos
+railway variables set UPLOAD_DIR=./uploads
 
 # Frontend URL (set after deploying frontend)
 railway variables set FRONTEND_URL=https://your-frontend.up.railway.app
@@ -149,13 +150,11 @@ That account is the canonical Part 3 demo admin used for the `Insights` walkthro
 
 ## Step 4: Deploy the Frontend
 
-Edit `frontend/index.html` — find this line near the top of the `<script>` block:
-```js
-const API = window.location.hostname === 'localhost'
-  ? 'http://localhost:4000'
-  : 'https://your-backend.up.railway.app'; // ← UPDATE THIS
+The frontend serves `/config.js`, which exposes the backend URL to the SPA. Set it as a Railway variable instead of editing `frontend/index.html`:
+
+```bash
+railway variables set FRONTEND_API_URL=https://your-backend.up.railway.app
 ```
-Replace with your actual backend Railway URL.
 
 Deploy frontend as a Railway static site:
 ```bash
@@ -173,6 +172,14 @@ Or simply host on **Netlify** (drag-and-drop `frontend/` folder) — it's free a
 Once both are deployed, update the backend's FRONTEND_URL:
 ```bash
 railway variables set FRONTEND_URL=https://your-frontend.up.railway.app
+```
+
+Then verify the live beta deployment from the repo root:
+
+```bash
+node scripts/verify-beta-deployment.js \
+  --frontend https://your-frontend.up.railway.app \
+  --backend https://your-backend.up.railway.app
 ```
 
 ---
@@ -202,11 +209,25 @@ npm run dev    # nodemon, runs on http://localhost:4000
 
 ---
 
-## Gmail App Password (for email notifications)
+## Beta Readiness
+
+Before inviting testers, follow:
+
+- [Beta readiness gate](./docs/beta-readiness.md)
+- [Beta QA checklist](./docs/beta-qa-checklist.md)
+- [Beta outreach copy](./docs/beta-outreach.md)
+
+Keep beta feedback in an external Google Form or Tally form and link it from your DMs/posts instead of adding a new in-app feedback feature.
+
+---
+
+## Gmail App Password (SMTP fallback only)
 
 1. Go to your Google Account → Security → 2-Step Verification → App Passwords
 2. Create one for "Mail"
 3. Use that 16-char password as `SMTP_PASS`
+
+For Railway Hobby production, prefer `RESEND_API_KEY` and `RESEND_FROM`; outbound SMTP is blocked on that plan.
 
 ---
 
