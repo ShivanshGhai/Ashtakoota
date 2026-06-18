@@ -8,13 +8,15 @@ Ashtakoota is a full-stack dating app prototype that combines profile discovery 
 
 This project explores what a more intentional dating experience could look like: users create detailed profiles, browse compatible people, request deeper readings, view match breakdowns, and move into chat when there is mutual interest.
 
-The live demo is self-contained and runs without a backend service. It uses built-in sample data so the main product flows can be reviewed even while the full deployment is paused during my studies.
+The live demo is a work-in-progress snapshot, not the final product. It is self-contained and runs without a backend service, using built-in sample data so the main product flows can be reviewed while the full deployment is paused during my studies.
 
 ## Course Project
 
 Ashtakoota was built as a final project for CMPT 354: Database Systems.
 
 Team: Shivansh Ghai, Saransh Nagpal, and Sadhika Huria.
+
+After the course ended, I continued the project independently and plan to keep improving it as time allows.
 
 ## Highlights
 
@@ -36,7 +38,7 @@ Team: Shivansh Ghai, Saransh Nagpal, and Sadhika Huria.
 
 ## Project Status
 
-The GitHub Pages demo is available now and does not require Railway or any paid hosting. The full backend implementation remains in the repository and can be redeployed later when I have time to actively maintain the project again.
+The GitHub Pages demo is available now and does not require Railway or any paid hosting. It should be treated as an in-progress public demo rather than a finished production app. The full backend implementation remains in the repository and can be redeployed later as I continue the project solo.
 
 ## Run Locally
 
