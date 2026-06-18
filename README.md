@@ -2,7 +2,7 @@
 
 Ashtakoota is a full-stack dating app prototype that combines profile discovery with Vedic compatibility scoring.
 
-[Live Demo](https://shivanshghai.github.io/ashtakoota/?demo=1) · [Source Code](https://github.com/shivanshghai/ashtakoota)
+[Live Demo](https://shivanshghai.github.io/Ashtakoota/?demo=1) · [Source Code](https://github.com/ShivanshGhai/Ashtakoota)
 
 ## Overview
 
