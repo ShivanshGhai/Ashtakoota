@@ -1591,7 +1591,7 @@ box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
   </div>
 </div>
 
-<script src="/config.js"></script>
+<script src="config.js"></script>
 <script>
 // ══════════════════════════════════════════════════════
 // CONFIG
@@ -1600,6 +1600,9 @@ const API = window.__ASHTAKOOTA_CONFIG__?.API_BASE_URL
   || (['localhost', '127.0.0.1'].includes(window.location.hostname)
     ? 'http://localhost:4000'
     : window.location.origin);
+const DEMO_MODE = window.__ASHTAKOOTA_CONFIG__?.DEMO_MODE === true
+  || new URLSearchParams(window.location.search).get('demo') === '1'
+  || window.location.hash === '#demo';
 
 // ── State ─────────────────────────────────────────────
 let token = null;
@@ -1846,8 +1849,310 @@ function renderPhotoGallery(user, label = 'Profile gallery') {
     </div>`;
 }
 
+const DEMO_USERS = [
+  {
+    id: 1,
+    username: 'Shivansh',
+    email: 'demo@ashtakoota.app',
+    genderIdentity: 'man',
+    lookingFor: 'woman',
+    relationshipIntent: 'marriage',
+    birthLocation: 'Vancouver, Canada',
+    cityRegion: 'Vancouver, Canada',
+    age: 24,
+    rashi: 'Vrishabha',
+    nakshatra: 'Rohini',
+    gana: 'Manushya',
+    nadi: 'Madhya',
+    yoni: 'Serpent',
+    varna: 'Vaishya',
+    rashiRuler: 'Venus',
+    vashyaGroup: 'Chatushpada',
+    emailVerified: true,
+    isAdmin: true,
+    bio: 'Building carefully, studying seriously, and looking for something intentional.',
+    profilePrompt: 'Slow-burn connection, direct communication, and shared ambition.',
+  },
+  {
+    id: 2,
+    username: 'Anika',
+    email: 'anika@example.com',
+    genderIdentity: 'woman',
+    lookingFor: 'man',
+    relationshipIntent: 'marriage',
+    birthLocation: 'Surrey, Canada',
+    cityRegion: 'Surrey, Canada',
+    age: 23,
+    rashi: 'Karka',
+    nakshatra: 'Pushya',
+    gana: 'Deva',
+    nadi: 'Adi',
+    yoni: 'Sheep',
+    varna: 'Brahmin',
+    rashiRuler: 'Moon',
+    vashyaGroup: 'Jalachara',
+    liked: false,
+    bio: 'Family-oriented, ambitious, and allergic to casual ambiguity.',
+    profilePrompt: 'A relationship should feel calm, chosen, and future-facing.',
+    compatEval: {
+      evalId: 101,
+      totalScore: 31,
+      label: 'Good',
+      reasons: [
+        { koota: 'GrahaMaitri' },
+        { koota: 'Bhakoot' },
+      ],
+    },
+  },
+  {
+    id: 3,
+    username: 'Meera',
+    email: 'meera@example.com',
+    genderIdentity: 'woman',
+    lookingFor: 'man',
+    relationshipIntent: 'long-term',
+    birthLocation: 'Burnaby, Canada',
+    cityRegion: 'Burnaby, Canada',
+    age: 25,
+    rashi: 'Mithuna',
+    nakshatra: 'Ardra',
+    gana: 'Manushya',
+    nadi: 'Adi',
+    yoni: 'Dog',
+    varna: 'Shudra',
+    rashiRuler: 'Mercury',
+    vashyaGroup: 'Manava',
+    liked: true,
+    bio: 'Designer, reader, and believer in hard conversations handled softly.',
+    profilePrompt: 'I notice consistency faster than charisma.',
+    compatEval: {
+      evalId: 102,
+      totalScore: 27,
+      label: 'Good',
+      reasons: [
+        { koota: 'Tara' },
+        { koota: 'Gana' },
+      ],
+    },
+  },
+  {
+    id: 4,
+    username: 'Priya',
+    email: 'priya@example.com',
+    genderIdentity: 'woman',
+    lookingFor: 'man',
+    relationshipIntent: 'serious-dating',
+    birthLocation: 'Richmond, Canada',
+    cityRegion: 'Richmond, Canada',
+    age: 24,
+    rashi: 'Simha',
+    nakshatra: 'Magha',
+    gana: 'Rakshasa',
+    nadi: 'Antya',
+    yoni: 'Rat',
+    varna: 'Kshatriya',
+    rashiRuler: 'Sun',
+    vashyaGroup: 'Vanachara',
+    liked: false,
+    bio: 'Practical, expressive, and more interested in values than performance.',
+    profilePrompt: 'Make the small things reliable and the big things honest.',
+    compatEval: {
+      evalId: 103,
+      totalScore: 22,
+      label: 'Average',
+      reasons: [
+        { koota: 'Varna' },
+        { koota: 'Vashya' },
+      ],
+    },
+  },
+];
+
+const DEMO_MATCHES = [
+  {
+    MatchID: 501,
+    EvalID: 101,
+    OtherUserID: 2,
+    OtherUsername: 'Anika',
+    OtherRashi: 'Karka',
+    OtherNakshatra: 'Pushya',
+    MatchCreatedAt: '2026-05-28T18:30:00Z',
+    TotalScore: 31,
+    MatchQualityLabel: 'Good',
+    MessageCount: 2,
+  },
+  {
+    MatchID: 502,
+    EvalID: 102,
+    OtherUserID: 3,
+    OtherUsername: 'Meera',
+    OtherRashi: 'Mithuna',
+    OtherNakshatra: 'Ardra',
+    MatchCreatedAt: '2026-06-06T19:45:00Z',
+    TotalScore: 27,
+    MatchQualityLabel: 'Good',
+    MessageCount: 0,
+  },
+];
+
+const DEMO_KOOTAS = [
+  ['Varna', 1, 1, 'Shared values and life expectations are aligned.'],
+  ['Vashya', 2, 2, 'There is natural attraction without needing to force momentum.'],
+  ['Tara', 3, 2, 'The connection has a supportive emotional rhythm.'],
+  ['Yoni', 4, 3, 'Physical chemistry reads as compatible and balanced.'],
+  ['GrahaMaitri', 5, 5, 'Conversation and emotional understanding should come easily.'],
+  ['Gana', 6, 5, 'Temperament fit is strong enough for real-world friction.'],
+  ['Bhakoot', 7, 6, 'Long-term harmony is one of the stronger signals here.'],
+  ['Nadi', 8, 7, 'Pace and closeness needs are likely to feel compatible.'],
+].map(([KootaType, MaxScore, ScoreValue, ExplanationText]) => ({ KootaType, MaxScore, ScoreValue, ExplanationText }));
+
+const DEMO_MESSAGES = {
+  501: [
+    { MessageID: 1, MatchID: 501, SenderID: 2, Body: 'I liked that your profile actually says what you are building toward. That feels rare here.', SentAt: '2026-06-10T18:10:00Z' },
+    { MessageID: 2, MatchID: 501, SenderID: 1, Body: 'That stood out to me too. I would rather start with clarity than perform chemistry for a week.', SentAt: '2026-06-10T18:18:00Z' },
+  ],
+  502: [],
+};
+
+function demoCompatibility(evalId) {
+  const match = DEMO_MATCHES.find(m => m.EvalID === Number(evalId)) || DEMO_MATCHES[0];
+  const partner = DEMO_USERS.find(u => u.username === match.OtherUsername) || DEMO_USERS[1];
+  return {
+    eval: {
+      EvalID: match.EvalID,
+      User1Username: DEMO_USERS[0].username,
+      User1Rashi: DEMO_USERS[0].rashi,
+      User1Nakshatra: DEMO_USERS[0].nakshatra,
+      User2Username: partner.username,
+      User2Rashi: partner.rashi,
+      User2Nakshatra: partner.nakshatra,
+      TotalScore: match.TotalScore,
+      MatchQualityLabel: match.MatchQualityLabel,
+    },
+    kootas: DEMO_KOOTAS,
+  };
+}
+
+async function demoApi(method, path, body) {
+  await new Promise(resolve => setTimeout(resolve, 120));
+  const [rawPath, rawQuery = ''] = path.split('?');
+  const params = new URLSearchParams(rawQuery);
+
+  if (rawPath === '/api/auth/me' || rawPath === '/api/auth/login') {
+    return { token: 'demo-token', user: { ...DEMO_USERS[0] } };
+  }
+  if (rawPath === '/api/auth/register') {
+    return { token: 'demo-token', user: { ...DEMO_USERS[0] }, verificationEmailSent: true };
+  }
+  if (rawPath === '/api/safety/blocked') return { blocked: [] };
+  if (rawPath === '/api/matches/list') return { matches: DEMO_MATCHES.map(m => ({ ...m })) };
+  if (rawPath === '/api/users/best-matches') {
+    return {
+      bestMatches: DEMO_USERS.slice(1, 4).map(user => ({
+        user,
+        totalScore: user.compatEval?.totalScore || 0,
+        reasons: user.compatEval?.reasons || [],
+      })),
+    };
+  }
+  if (rawPath === '/api/users') {
+    let users = DEMO_USERS.slice(1);
+    const search = params.get('search')?.toLowerCase();
+    const intent = params.get('intentFilter');
+    const rashi = params.get('rashiFilter');
+    const gana = params.get('ganaFilter');
+    const minScore = Number(params.get('minScore') || 0);
+    if (search) users = users.filter(user => user.username.toLowerCase().includes(search) || user.cityRegion.toLowerCase().includes(search));
+    if (intent) users = users.filter(user => user.relationshipIntent === intent);
+    if (rashi) users = users.filter(user => user.rashi === rashi);
+    if (gana) users = users.filter(user => user.gana === gana);
+    if (minScore) users = users.filter(user => (user.compatEval?.totalScore || 0) >= minScore);
+    return { users };
+  }
+  if (rawPath.startsWith('/api/users/') && method === 'GET') {
+    const userId = Number(rawPath.split('/').pop());
+    const user = DEMO_USERS.find(u => u.id === userId);
+    return { user, compatEval: user?.compatEval, liked: !!user?.liked };
+  }
+  if (rawPath === '/api/users/me' && method === 'PATCH') return { ok: true };
+  if (rawPath === '/api/compatibility/history') {
+    return {
+      history: DEMO_MATCHES.map(m => ({
+        EvalID: m.EvalID,
+        OtherUsername: m.OtherUsername,
+        OtherRashi: m.OtherRashi,
+        TotalScore: m.TotalScore,
+        MatchQualityLabel: m.MatchQualityLabel,
+        EvaluatedAtTimestamp: m.MatchCreatedAt,
+      })),
+    };
+  }
+  if (rawPath.startsWith('/api/compatibility/') && method === 'GET') {
+    return demoCompatibility(rawPath.split('/').pop());
+  }
+  if (rawPath === '/api/compat-requests') {
+    return {
+      requests: [{
+        RequestID: 701,
+        FromUsername: 'Priya',
+        FromRashi: 'Simha',
+        FromNakshatra: 'Magha',
+        ExpiresAt: new Date(Date.now() + 30 * 3600000).toISOString(),
+      }],
+    };
+  }
+  if (rawPath === '/api/compat-requests/sent') {
+    return { sent: [{ RequestID: 702, ToUsername: 'Meera', ToRashi: 'Mithuna', Status: 'pending' }] };
+  }
+  if (rawPath.startsWith('/api/compat-requests/') && method === 'PATCH') {
+    return { eval: { totalScore: 29, matchQualityLabel: 'Good' } };
+  }
+  if (rawPath.startsWith('/api/compat-requests/') || rawPath.startsWith('/api/likes/') || rawPath.startsWith('/api/safety/')) {
+    return { ok: true, match: body ? null : undefined };
+  }
+  if (rawPath.startsWith('/api/chat/') && rawPath.endsWith('/messages')) {
+    const matchId = Number(rawPath.split('/')[3]);
+    if (method === 'POST') {
+      DEMO_MESSAGES[matchId] = DEMO_MESSAGES[matchId] || [];
+      DEMO_MESSAGES[matchId].push({
+        MessageID: Date.now(),
+        MatchID: matchId,
+        SenderID: currentUser?.id || 1,
+        Body: body?.body || '',
+        SentAt: new Date().toISOString(),
+      });
+    }
+    return { messages: DEMO_MESSAGES[matchId] || [], totalMessages: (DEMO_MESSAGES[matchId] || []).length };
+  }
+  if (rawPath === '/api/notifications') {
+    return {
+      unreadCount: 2,
+      notifications: [
+        { NotifID: 801, Type: 'match', IsRead: 0, Payload: { matchId: 501, evalId: 101, score: 31, label: 'Good' }, CreatedAt: '2026-06-10T18:10:00Z' },
+        { NotifID: 802, Type: 'compat_request', IsRead: 0, Payload: { fromUsername: 'Priya' }, CreatedAt: '2026-06-12T15:00:00Z' },
+      ],
+    };
+  }
+  if (rawPath === '/api/insights/overview') {
+    return { overview: { totalReadings: 12, averageCompatibilityScore: 27, divisionQualifiedUsers: 3, highestScore: 31, strongestPair: { UserOne: 'Shivansh', UserTwo: 'Anika', TotalScore: 31 }, ruleSource: 'demo data', ruleLoadedAt: new Date().toISOString() } };
+  }
+  if (rawPath === '/api/insights/query-lab') {
+    const sampleRows = [{ UserOne: 'Shivansh', UserTwo: 'Anika', TotalScore: 31 }];
+    return { queryLab: {
+      joinQuery: { title: 'Join Query Demo', sql: 'SELECT users and compatibility results', rows: sampleRows },
+      divisionQuery: { title: 'Division Query Demo', sql: 'Find users with readings across partner types', rows: [{ Username: 'Shivansh', CompletedTypes: 3 }] },
+      aggregationQuery: { title: 'Aggregation Query Demo', sql: 'Average compatibility score', rows: [{ AverageScore: 27 }] },
+      groupByAggregation: { title: 'Grouped Aggregation Demo', sql: 'Scores grouped by match label', rows: [{ MatchQualityLabel: 'Good', Count: 2 }] },
+      deleteCascadeDemo: { title: 'Delete With Cascade Demo', sql: 'Preview cascade-safe match deletion', target: { EvalID: 101, MatchID: 501 }, rows: sampleRows, notes: ['Demo only; no data is deleted.'] },
+      updateOperationDemo: { title: 'Update Operation Demo', sql: 'Preview profile/notification updates', rows: [{ Area: 'Profile', Status: 'Editable in demo UI' }], notes: ['Demo only; changes stay in the browser session.'] },
+    } };
+  }
+  return { ok: true };
+}
+
 // ── API helper ────────────────────────────────────────
 async function api(method, path, body, isFormData) {
+  if (DEMO_MODE) return demoApi(method, path, body, isFormData);
   const opts = {
     method,
     credentials: 'include',
@@ -2357,9 +2662,11 @@ async function afterLogin() {
 }
 
 async function doLogout(silent = false) {
-  try {
-    await fetch(`${API}/api/auth/logout`, { method: 'POST', credentials: 'include' });
-  } catch {}
+  if (!DEMO_MODE) {
+    try {
+      await fetch(API + '/api/auth/logout', { method: 'POST', credentials: 'include' });
+    } catch {}
+  }
   token = null; currentUser = null;
   blockedUserIds = new Set();
   if (wsSocket) { wsSocket.disconnect(); wsSocket = null; }
@@ -2780,6 +3087,10 @@ async function openCompat(evalId, matchId) {
 
 async function downloadCert() {
   if (!selectedEvalId) return;
+  if (DEMO_MODE) {
+    toast('PDF certificate generation is disabled in the static portfolio demo.');
+    return;
+  }
   try {
     const res = await fetch(`${API}/api/compatibility/${selectedEvalId}/certificate`, { credentials: 'include' });
     if (!res.ok) {
@@ -3470,6 +3781,7 @@ async function handleNotifClick(notifId) {
 
 // ── WEBSOCKET ─────────────────────────────────────────
 function connectWebSocket() {
+  if (DEMO_MODE) return;
   if (!currentUser || wsSocket) return;
   // Load socket.io from CDN
   const startSocket = () => {

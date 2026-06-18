@@ -1,309 +1,49 @@
-# Ashtakoota — Vedic Dating App
+# Ashtakoota
 
-Full-stack dating platform powered by Vedic astrology (Ashtakoota / Guna Milan).
+Ashtakoota is a full-stack dating app prototype that combines profile discovery with Vedic compatibility scoring.
 
-## Architecture
+[Live Demo](https://shivanshghai.github.io/ashtakoota/?demo=1) · [Source Code](https://github.com/shivanshghai/ashtakoota)
 
-```
-ashtakoota/
-├── backend/          → Node.js + Express + MySQL (deploy to Railway)
-│   ├── server.js         Main entry point + Socket.io
-│   ├── config/
-│   │   ├── db.js         MySQL2 connection pool
-│   │   ├── schema.sql    Full DB schema + Part 3 rule tables
-│   │   └── submission_setup.sql  Submission bootstrap with demo data
-│   ├── routes/
-│   │   ├── auth.js       Register / Login / /me
-│   │   ├── users.js      Browse profiles, best matches
-│   │   ├── social.js     Likes, match creation, Koota auto-calc
-│   │   ├── compatRequests.js  Intentional reading request system
-│   │   ├── compatibility.js  Eval detail, score history, PDF cert
-│   │   ├── insights.js   Query lab + analytics endpoints
-│   │   ├── chat.js       REST + WebSocket real-time chat
-│   │   └── notifications.js  In-app notification feed
-│   ├── utils/
-│   │   ├── koota.js      8-Koota engine using DB-backed scoring rules
-│   │   ├── compatRules.js Compatibility rule loader with fallback cache
-│   │   ├── astrology.js  Prokerala API + local ephemeris fallback
-│   │   ├── pdfCert.js    Guna Milan PDF certificate generator
-│   │   └── mailer.js     Email notifications (Nodemailer)
-│   └── middleware/
-│       └── auth.js       JWT verification
-└── frontend/
-    └── index.html        Single-file SPA (deploy to Railway Static)
-```
+## Overview
 
-## Features
+This project explores what a more intentional dating experience could look like: users create detailed profiles, browse compatible people, request deeper readings, view match breakdowns, and move into chat when there is mutual interest.
 
-| Feature | Implementation |
-|---|---|
-| Auth | JWT (7-day tokens), bcrypt passwords |
-| Birth chart | Prokerala API → local ephemeris fallback |
-| 8 Kootas | Hybrid engine with DB-backed rule tables + Node orchestration |
-| Likes + Matches | Mutual-like detection → auto Koota calc |
-| Compat requests | Intentional 48h-expiry request system |
-| Score history | All past readings per user |
-| Best matches | Top 3 by total Guna score |
-| PDF certificate | Guna Milan cert via PDFKit |
-| Real-time chat | Socket.io WebSocket + REST fallback |
-| Notifications | In-app feed + email via Resend or Nodemailer |
-| Avatars | Multer file upload, served statically |
-| Insights | Live query lab for join, division, aggregation, group-by, delete, update demos |
+The live demo is self-contained and runs without a backend service. It uses built-in sample data so the main product flows can be reviewed even while the full deployment is paused during my studies.
 
----
+## Highlights
 
-## Step 1: Set up Railway
+- Profile onboarding with relationship intent, birth details, photos, and personal prompts.
+- Compatibility scoring based on the Ashtakoota system, shown as clear match summaries and detailed breakdowns.
+- Discovery feed with profile cards, match signals, likes, and reading requests.
+- Match history, saved compatibility results, and certificate download flow.
+- Chat interface for mutual matches, including first-message guidance.
+- Safety-minded flows for blocking, reporting, notifications, and a moderation view.
 
-1. Go to [railway.app](https://railway.app) and create a free account
-2. Install Railway CLI: `npm install -g @railway/cli`
-3. Login: `railway login`
+## Tech Stack
 
----
+- Frontend: HTML, CSS, vanilla JavaScript
+- Backend: Node.js, Express
+- Database: MySQL
+- Auth and security: JWT, bcrypt, cookie/session handling, route middleware
+- Realtime: Socket.io
+- Other services: file uploads, PDF generation, email notifications
 
-## Step 2: Deploy the Backend
+## Project Status
+
+The GitHub Pages demo is available now and does not require Railway or any paid hosting. The full backend implementation remains in the repository and can be redeployed later when I have time to actively maintain the project again.
+
+## Run Locally
 
 ```bash
-cd ashtakoota/backend
+cd frontend
 npm install
-
-# Create a new Railway project
-railway init
-
-# Add a MySQL database
-railway add mysql
+npm start
 ```
 
-Railway will give you a `DATABASE_URL`. Get individual credentials:
-```bash
-railway variables
-```
+Then open `http://localhost:3000/?demo=1` for the self-contained demo.
 
-Set all environment variables:
-```bash
-railway variables set DB_HOST=<mysql_host_from_railway>
-railway variables set DB_PORT=3306
-railway variables set DB_USER=root
-railway variables set DB_PASSWORD=<mysql_password>
-railway variables set DB_NAME=railway
-railway variables set JWT_SECRET=<generate_64_char_random_string>
-railway variables set JWT_EXPIRES_IN=7d
-railway variables set PORT=4000
-railway variables set ADMIN_EMAILS=arjun_demo@example.com
+To run the backend locally, install dependencies in `backend/`, create the required environment variables for MySQL and auth secrets, and start `backend/server.js`.
 
-# Optional: Prokerala API (sign up free at https://api.prokerala.com)
-railway variables set PROKERALA_CLIENT_ID=<your_id>
-railway variables set PROKERALA_CLIENT_SECRET=<your_secret>
+## What I Built
 
-# Email verification and notifications
-# Railway Hobby blocks SMTP, so use Resend's HTTPS API in production.
-railway variables set RESEND_API_KEY=<your_resend_api_key>
-railway variables set RESEND_FROM="Ashtakoota <onboarding@resend.dev>"
-
-# Persistent uploaded photos
-railway variables set UPLOAD_DIR=./uploads
-
-# Frontend URL (set after deploying frontend)
-railway variables set FRONTEND_URL=https://your-frontend.up.railway.app
-```
-
-Deploy:
-```bash
-railway up
-```
-
-Note your backend URL: `https://your-backend.up.railway.app`
-
-`ADMIN_EMAILS` is the preferred grading configuration for `Insights`. If it is not set, the backend falls back to `arjun_demo@example.com` as the demo admin so the seeded Part 3 walkthrough is still reproducible.
-
----
-
-## Step 3: Initialise the Database
-
-Connect to Railway MySQL and run the schema:
-```bash
-# Get connection string
-railway connect mysql
-
-# Or use TablePlus / DBeaver with Railway MySQL credentials
-# Then run: backend/config/schema.sql
-```
-
-This creates all tables and seeds Planet, Rashi, Nakshatra data.
-
-For the Part 3 submission/demo dataset, run the bootstrap from inside `backend/config`:
-```bash
-cd backend/config
-mysql -u <user> -p <database> < submission_setup.sql
-```
-
-That script loads the schema plus demo users, matches, readings, messages, and notifications so the query lab has non-empty results.
-
-The seeded demo login is:
-```text
-Email: arjun_demo@example.com
-Password: Part3Demo!
-```
-
-That account is the canonical Part 3 demo admin used for the `Insights` walkthrough.
-
----
-
-## Step 4: Deploy the Frontend
-
-The frontend serves `/config.js`, which exposes the backend URL to the SPA. Set it as a Railway variable instead of editing `frontend/index.html`:
-
-```bash
-railway variables set FRONTEND_API_URL=https://your-backend.up.railway.app
-```
-
-Deploy frontend as a Railway static site:
-```bash
-cd ashtakoota/frontend
-railway init  # new project for frontend
-railway up
-```
-
-Or simply host on **Netlify** (drag-and-drop `frontend/` folder) — it's free and instant.
-
----
-
-## Step 5: Update CORS
-
-Once both are deployed, update the backend's FRONTEND_URL:
-```bash
-railway variables set FRONTEND_URL=https://your-frontend.up.railway.app
-```
-
-Then verify the live beta deployment from the repo root:
-
-```bash
-node scripts/verify-beta-deployment.js \
-  --frontend https://your-frontend.up.railway.app \
-  --backend https://your-backend.up.railway.app
-```
-
----
-
-## Local Development
-
-```bash
-# Backend
-cd backend
-cp .env.example .env
-# Fill in .env with your local MySQL / Railway credentials
-npm install
-npm run dev    # nodemon, runs on http://localhost:4000
-
-# Frontend — just open index.html in browser
-# Or: npx serve frontend/
-```
-
----
-
-## Prokerala API Setup (for accurate birth charts)
-
-1. Go to [api.prokerala.com](https://api.prokerala.com) → Sign up free
-2. Create an application → get Client ID + Client Secret
-3. Set as Railway env vars (see Step 2)
-4. Without these, the app uses a built-in lunar ephemeris (±1° accuracy)
-
----
-
-## Beta Readiness
-
-Before inviting testers, follow:
-
-- [Beta readiness gate](./docs/beta-readiness.md)
-- [Beta QA checklist](./docs/beta-qa-checklist.md)
-- [Beta outreach copy](./docs/beta-outreach.md)
-
-Keep beta feedback in an external Google Form or Tally form and link it from your DMs/posts instead of adding a new in-app feedback feature.
-
----
-
-## Gmail App Password (SMTP fallback only)
-
-1. Go to your Google Account → Security → 2-Step Verification → App Passwords
-2. Create one for "Mail"
-3. Use that 16-char password as `SMTP_PASS`
-
-For Railway Hobby production, prefer `RESEND_API_KEY` and `RESEND_FROM`; outbound SMTP is blocked on that plan.
-
----
-
-## Scoring Reference
-
-| Score | Label |
-|---|---|
-| 33–36 | Excellent |
-| 25–32 | Good |
-| 18–24 | Average |
-| 0–17  | Poor |
-
-### The 8 Kootas
-
-| Koota | Max | Tests |
-|---|---|---|
-| Varna | 1 | Spiritual compatibility |
-| Vashya | 2 | Mutual attraction |
-| Tara | 3 | Destiny / health |
-| Yoni | 4 | Physical compatibility |
-| Graha Maitri | 5 | Planetary friendship |
-| Gana | 6 | Temperament |
-| Bhakoot | 7 | Emotional harmony |
-| Nadi | 8 | Life energy / progeny |
-
----
-
-## API Reference
-
-```
-POST   /api/auth/register          Register (multipart/form-data with avatar)
-POST   /api/auth/login             Login → JWT
-GET    /api/auth/me                Current user
-
-GET    /api/users                  Browse users (search/rashi/gana/minScore filters)
-GET    /api/users/best-matches     Top 3 by Guna score
-GET    /api/users/:id              Single profile + eval + liked status
-PATCH  /api/users/me               Update bio / avatar
-
-POST   /api/likes/:targetId        Like a user (auto-matches if mutual)
-DELETE /api/likes/:targetId        Unlike
-GET    /api/matches/list           My matches with scores
-
-POST   /api/compat-requests/:id    Send reading request (48h expiry)
-GET    /api/compat-requests        Incoming pending requests
-GET    /api/compat-requests/sent   Sent requests
-PATCH  /api/compat-requests/:id    Accept / decline
-
-GET    /api/compatibility/:evalId           Full Koota breakdown
-GET    /api/compatibility/:evalId/history   Score history for user
-GET    /api/compatibility/:evalId/certificate  PDF download
-
-GET    /api/chat/:matchId/messages  Message history
-POST   /api/chat/:matchId/messages  Send (REST fallback)
-
-GET    /api/notifications           Notification feed
-PATCH  /api/notifications/read-all  Mark all read
-
-GET    /api/insights/overview       Part 3 analytics overview
-GET    /api/insights/query-lab      Part 3 query demo result sets
-
-WS     /chat (Socket.io namespace)
-  emit: join_match { matchId }
-  emit: send_message { matchId, body }
-  on:   new_message { ...msg, senderUsername }
-```
-
----
-
-## Part 3 Demo Notes
-
-- Use `arjun_demo@example.com` / `Part3Demo!` for the rubric-driven walkthrough.
-- `Insights` is intended to show the required join, division, aggregation, grouped aggregation, delete-with-cascade, and update demonstrations.
-- The delete demo removes a `MATCH_RECORD`, which cascades to `INVOLVES` and `MESSAGES`. Compatibility history stays in `COMPATIBILITY_EVAL` and `KOOTA_SCORE`.
-- Trigger-backed integrity rules live in `backend/config/schema.sql`; a simple demo is `INSERT INTO LIKES (UserA, UserB) VALUES (1, 1);`, which should fail.
-
-## Part 3 Submission Packaging
-
-Use [part3-submission-checklist.md](/Users/shivanshghai/Library/Mobile Documents/com~apple~CloudDocs/CMPT 354/Project/ashtakoota/docs/part3-submission-checklist.md) before creating the final zip. Do not include `.git`, `node_modules`, `.env`, `.DS_Store`, or the temporary screenshot files under `frontend/`.
+I designed and implemented the end-to-end product prototype: the single-page frontend, Express API, compatibility logic, database schema, auth flows, match/request/chat features, and demo mode used for the public project link.
