@@ -10,6 +10,12 @@ This project explores what a more intentional dating experience could look like:
 
 The live demo is self-contained and runs without a backend service. It uses built-in sample data so the main product flows can be reviewed even while the full deployment is paused during my studies.
 
+## Course Project
+
+Ashtakoota was built as a final project for CMPT 354: Database Systems.
+
+Team: Shivansh Ghai, Saransh Nagpal, and Sadhika Huria.
+
 ## Highlights
 
 - Profile onboarding with relationship intent, birth details, photos, and personal prompts.
@@ -44,6 +50,8 @@ Then open `http://localhost:3000/?demo=1` for the self-contained demo.
 
 To run the backend locally, install dependencies in `backend/`, create the required environment variables for MySQL and auth secrets, and start `backend/server.js`.
 
-## What I Built
+## Contributions
 
-I designed and implemented the end-to-end product prototype: the single-page frontend, Express API, compatibility logic, database schema, auth flows, match/request/chat features, and demo mode used for the public project link.
+- **Shivansh Ghai**: database implementation, product brainstorming, and bug testing.
+- **Saransh Nagpal**: API maintenance, bug testing, and initial database design, including ER diagrams and relational schemas.
+- **Sadhika Huria**: frontend implementation.
